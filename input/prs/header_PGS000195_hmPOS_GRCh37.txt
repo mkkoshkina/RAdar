@@ -1,0 +1,19 @@
+###PGS CATALOG SCORING FILE - see https://www.pgscatalog.org/downloads/#dl_ftp_scoring for additional information
+#format_version=2.0
+##POLYGENIC SCORE (PGS) INFORMATION
+#pgs_id=PGS000195
+#pgs_name=G-PROB_Raneg
+#trait_reported=Rheumatoid arthritis (CCP-negative)
+#trait_mapped=ACPA-negative rheumatoid arthritis
+#trait_efo=EFO_0009460
+#genome_build=GRCh38
+#variants_number=96
+#weight_type=log(OR)
+##SOURCE INFORMATION
+#pgp_id=PGP000081
+#citation=Knevel R et al. Sci Transl Med (2020). doi:10.1126/scitranslmed.aay1548
+##HARMONIZATION DETAILS
+#HmPOS_build=GRCh37
+#HmPOS_date=2024-10-24
+#HmPOS_match_chr={"True": null, "False": null}
+#HmPOS_match_pos={"True": null, "False": null}
