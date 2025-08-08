@@ -1,6 +1,6 @@
-jupiter_notebooks/gene_mapping.json
-jupiter_notebooks/gwas_catalog_v1.0-associations_e114_r2025-07-21.tsv
-jupiter_notebooks/PGS000195_hmPOS_GRCh37.txt
-jupiter_notebooks/yet_another_final_PGS000195_metadata.csv
+jupyter_notebooks/gene_mapping.json
+jupyter_notebooks/gwas_catalog_v1.0-associations_e114_r2025-07-21.tsv
+jupyter_notebooks/PGS000195_hmPOS_GRCh37.txt
+jupyter_notebooks/yet_another_final_PGS000195_metadata.csv
 *.pyc
 *__init__.py
