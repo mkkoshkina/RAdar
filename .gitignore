@@ -4,3 +4,6 @@ jupyter_notebooks/PGS000195_hmPOS_GRCh37.txt
 jupyter_notebooks/yet_another_final_PGS000195_metadata.csv
 *.pyc
 *__init__.py
+
+input/
+output/

@@ -24,7 +24,7 @@ def parse_profile_file(input_path):
             elif k == "SCORE1_AVG":
                 out["score"] = float(v)
         records.append(out)
-    return records
+    return json.dumps(records, indent=2)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
