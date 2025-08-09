@@ -323,7 +323,7 @@ def create_variants_table(plink_data=None, error_message=None):
                 html.P(f"Total SNPs found in your data: {snps_total:,}"),
                 html.P(f"SNPs used in risk calculation: {snps_used:,}"),
                 html.P(f"Coverage: {(snps_used/snps_total*100):.1f}%" if snps_total > 0 else "Coverage: N/A"),
-                html.P("Risk score calculated using PGS002769 (Rheumatoid Arthritis)")
+                html.P("Risk score calculated using PGS000195 (Rheumatoid Arthritis)")
             ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '5px'})
         ])
     
@@ -687,7 +687,7 @@ def prediction_layout(user_session):
     predictions = fetch_prediction_history(user_session)
     
     return html.Div([
-        html.H1("Genetic Arthritis Risk Prediction", 
+        html.H1("Rheumatoid Arthritis Polydenic Risk Score Prediction", 
                 style={'textAlign': 'center', 'color': '#333', 'marginBottom': '30px'}),
         
         html.Div(user_balance(balance), id='current-balance-predictions'),
@@ -695,7 +695,7 @@ def prediction_layout(user_session):
         genetic_upload_form(),
         
         html.Div([
-            html.H3("Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3("Your Polygenic Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
         ], className='card', style={**card_style, 'display': 'none'}, id='results-section'),
         
@@ -710,14 +710,14 @@ def prediction_layout(user_session):
         ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
         html.Div([
-            html.H3("Drug-Gene Interactions", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3("Mutations Responsible For Drug Efficacy and Toxicity", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='drug-annotation-content')
-        ], style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
 
         html.Div([
             html.H3("Top 10 Most Influential SNPs", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='top-10-snps-content')
-        ], style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
 
         html.Div([
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
