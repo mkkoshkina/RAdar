@@ -250,7 +250,7 @@ def create_risk_results(plink_data=None, error_message=None):
     if plink_data:
         risk = plink_data.get('score', 0.0)
         sample_id = plink_data.get('id', 'Unknown')
-        snps_used = plink_data.get('number_of_snps_used', 0)
+        snps_used = plink_data.get('number_of_alleles_detected', 0)
         
         mean = 1.05
         std_dev = 0.94 
@@ -268,7 +268,7 @@ def create_risk_results(plink_data=None, error_message=None):
 
     return html.Div([
         html.Div([
-            html.P(f"Analysis based on {snps_used} genetic variants", 
+            html.P(f"Number of alleles detected: {snps_used}", 
                    style={'fontSize': '14px', 'color': '#666', 'margin': '5px 0'})
         ]) if plink_data else "",
 
@@ -335,8 +335,8 @@ def create_variants_table(plink_data=None, error_message=None):
         return html.Div()
     
     if plink_data:
-        snps_total = plink_data.get('number_of_snps', 0)
-        snps_used = plink_data.get('number_of_snps_used', 0)
+        snps_total = plink_data.get('number_of_alleles_observed', 0)
+        snps_used = plink_data.get('number_of_alleles_detected', 0)
         
         return html.Div([
             html.H5("Polygenic Risk Score Analysis Summary", style={'margin': '15px 0 10px 0'}),
