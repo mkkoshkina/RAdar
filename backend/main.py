@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from backend.api.v1.routes import routers as v1_routers
 from backend.core.config import configs
 from backend.core.container import Container
+from backend.utils.class_object import singleton
 
 
 @singleton
