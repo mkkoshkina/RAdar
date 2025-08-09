@@ -38,7 +38,7 @@ def parse_profile_file(input_path):
             elif k == "SCORE1_AVG":
                 out["score"] = float(v)
         records.append(out)
-    return json.dumps(records, indent=2)
+    return records
 
 def create_prs_table(
     sscore_vars_path,
@@ -263,7 +263,8 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     total_duration = (datetime.now() - start_time).total_seconds()
     log_message(f"Done. Output at {output_json}", log_file)
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
-    return {"status": "success", "output_json": output_json, "log_file": log_file, "table_snps_used" : "output/final_prs_table.tsv"}
+    
+    return output_json_data
 
 
 # run_plink_pipeline(
