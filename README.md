@@ -23,7 +23,7 @@ Submit a POST request to `/predict` with a JSON payload specifying your VCF file
 curl -X POST http://localhost:5000/predict \
   -H "Content-Type: application/json" \
   -d '{
-    "vcf_file": "vcf/sample.vcf",
+    "vcf_file": "input/vcf/sample.vcf",
     "clean_tmp": true
   }'
 ```

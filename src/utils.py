@@ -266,8 +266,8 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     return {"status": "success", "output_json": output_json, "log_file": log_file, "table_snps_used" : "output/final_prs_table.tsv"}
 
 
-run_plink_pipeline(
-    input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
-    # assembly='GRCh37',
-    clean_tmp_files=False
-)
+# run_plink_pipeline(
+#     input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
+#     # assembly='GRCh37',
+#     clean_tmp_files=False
+# )
