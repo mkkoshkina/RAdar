@@ -258,16 +258,6 @@ def create_risk_results(plink_data=None, error_message=None):
         np.random.seed(0)
         samples = np.random.normal(loc=mean, scale=std_dev, size=1000)
         risk_percentile = percentileofscore(samples, risk, kind='weak')
-        
-        if risk_percentile >= 90:
-            risk_level = 'Very High'
-        elif risk_percentile >= 75:
-            risk_level = 'High'
-        elif risk_percentile >= 50:
-            risk_level = 'Moderate'
-        else:
-            risk_level = 'Low'
-            
         risk_label = compute_risk_label(risk_percentile)
     else:
         return html.Div([
@@ -277,9 +267,6 @@ def create_risk_results(plink_data=None, error_message=None):
         ])
 
     return html.Div([
-        #html.H4(f"Arthritis Risk Level: {risk_level}", 
-                #style={'color': risk_colors[risk_level], 'margin': '0 0 10px 0'}),
-
         html.Div([
             html.P(f"Analysis based on {snps_used} genetic variants", 
                    style={'fontSize': '14px', 'color': '#666', 'margin': '5px 0'})
