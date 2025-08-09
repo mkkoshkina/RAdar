@@ -36,8 +36,9 @@ def parse_profile_file(input_path):
                 out["number_of_alleles_observed"] = int(v)
             elif k == "NAMED_ALLELE_DOSAGE_SUM":
                 out["number_of_alleles_detected"] = int(v)
+                number_of_alleles = int(v)
             elif k == "SCORE1_AVG":
-                out["score"] = float(v)
+                out["score"] = float(v) * number_of_alleles
         records.append(out)
     return records
 
@@ -276,7 +277,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     step_start = datetime.now()
     result = subprocess.run([
         'plink2', '--bfile', f"{plink_prefix}_dedup", '--read-freq', freq_path,
-        '--score', prs_path, '1', '4', '6', 'header', 'list-variants', 'no-mean-imputation',
+        '--score', prs_path, '1', '4', '6', 'header', 'list-variants',
         '--out', f"{plink_prefix}_dedup.prs"
     ], capture_output=True, text=True)
     if result.returncode != 0:
