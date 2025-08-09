@@ -2,8 +2,8 @@
 
 INPUT_VCF=$1      # e.g., input/vcf/ng1657.hg38.vcf
 ASSEMBLY=$2       # e.g., GRCh38 or GRCh37
-PRS_PATH_PREFIX=$3       # e.g., input/prs/PGS002769_hmPOS
-CLEAN_TMP_FILES=${4:-true}  # true/false, default to false
+# PRS_PATH_PREFIX=$3       # e.g., input/prs/PGS002769_hmPOS
+CLEAN_TMP_FILES=${3:-true}  # true/false, default to false
 # Set ASSEMBLY variable (you can pass it as an argument or set it before running the script)
 
 # Choose PRS file based on ASSEMBLY
@@ -78,7 +78,7 @@ if [ "$CLEAN_TMP_FILES" = "true" ]; then
     log "Cleaning up temporary files..."
     rm -f "$FILTERED_VCF"
     rm -f "$PLINK_PREFIX".bed "$PLINK_PREFIX".bim "$PLINK_PREFIX".fam "$PLINK_PREFIX".log "$PLINK_PREFIX".nosex "$PLINK_PREFIX".prs.nopred
-    rm -f "${PLINK_PREFIX}_dedup.prs".log "${PLINK_PREFIX}_dedup.prs".nosex "${PLINK_PREFIX}_dedup.prs".profile
+    rm -f "${PLINK_PREFIX}_dedup".bed "${PLINK_PREFIX}_dedup".bim "${PLINK_PREFIX}_dedup".fam "${PLINK_PREFIX}_dedup".log "${PLINK_PREFIX}_dedup.prs".log "${PLINK_PREFIX}_dedup.prs".nosex "${PLINK_PREFIX}_dedup.prs".profile "${PLINK_PREFIX}_dedup".prs.sscore "${PLINK_PREFIX}_dedup".prs.sscore.vars
     log "Temporary files removed"
 fi
 

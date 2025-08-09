@@ -90,8 +90,8 @@ RUN wget https://github.com/samtools/bcftools/releases/download/${BCFTOOLS_VERSI
 RUN mkdir -p src \
     mkdir -p input
 
-RUN wget https://s3.amazonaws.com/plink2-assets/plink2_linux_avx2_20250707.zip \
-    && unzip plink2_linux_avx2_20250707.zip
+RUN wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20250806.zip \
+    && unzip plink2_linux_x86_64_20250806.zip
 
 # -------------------------------------------------------------------
 # PLINK 1.9 for Linux 64-bit (Stable) (release date: 2025-06-15)
