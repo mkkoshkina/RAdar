@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 from datetime import datetime
+from create_table_with_used_snps import create_prs_table
 
 def log_message(msg, log_file=None):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -126,6 +127,16 @@ def main():
                 os.remove(temp_file)
         log_message("Temporary files removed", log_file)
 
+    # Step 7: Table with used snps
+    create_prs_table(
+    sscore_vars_path="input/plink/lm5515_dedup.prs.sscore.vars",
+    full_score_path="input/prs/PGS000195_hmPOS_GRCh37.txt",
+    afreq_path="input/prs/PGS000195_hmPOS_GRCh37.freq",
+    bfile_prefix="input/plink/lm5515_dedup",
+    output_dir="output",
+    clean_tmp_files=True
+)
+    
     total_duration = (datetime.now() - start_time).total_seconds()
     log_message(f"Done. JSON output at {output_json}", log_file)
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
