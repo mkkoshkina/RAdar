@@ -368,25 +368,35 @@ def format_links(link_str):
         formatted_links.append(f"[{i+1}]({url})")
     return ' '.join(formatted_links)
 
-def create_variants_section():
+def create_variants_section(sample):
     csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
+    tsv_path = f'output/{sample}_final_prs_table.tsv'
+
     df = pd.read_csv(csv_path)
+    df_snps = pd.read_csv(tsv_path, sep='\t')
+
+    df['is_in_sample'] = df['rsID'].isin(df_snps['rsid'])
+    df['color'] = df['is_in_sample'].map({True: 'red', False: 'blue'})
 
     if 'Sources' in df.columns:
         df['Sources'] = df['Sources'].apply(format_links)
 
-    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
+    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description','color','is_in_sample']]
+
+    df_display = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
 
     fig = px.scatter(
         df,
         x='Position',
         y='Effect weight',
-        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True},
+        color='color',
+        color_discrete_map={'red': 'red', 'blue': 'blue'},
+        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True, 'color': False, 'is_in_sample': False},
     )
 
     fig.update_traces(
         customdata=df.to_dict('records'),
-        marker=dict(size=5, opacity=0.8, color='blue')
+        marker=dict(size=5, opacity=0.8)
     )
 
     fig.update_layout(
@@ -416,7 +426,7 @@ def create_variants_section():
                     columns=[
                         {'name': col, 'id': col, 'presentation': 'markdown'} if col == 'Sources'
                         else {'name': col, 'id': col}
-                        for col in df.columns if df[col].notna().any()
+                        for col in df_display.columns if df_display[col].notna().any()
                     ],
                     data=[],
                     style_table={'maxHeight': '350px', 'overflowY': 'auto', 'fontSize': '16px'},
@@ -691,7 +701,7 @@ def prediction_layout(user_session):
         
         html.Div([
             html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Div(create_variants_section())  
+            html.Div(id='variants-section-content')  
         ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
         html.Div([

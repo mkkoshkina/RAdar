@@ -312,7 +312,7 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('risk-results', 'children'),
-         Output('variants-section', 'children'),
+         Output('variants-section-content', 'children'),
          Output('current-balance-predictions', 'children', allow_duplicate=True),
          Output('results-section', 'style'),
          Output('variants-section', 'style'),
@@ -343,7 +343,8 @@ def register_callbacks(_app):
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
+                sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
             
             vcf_dir = 'input/vcf'
             os.makedirs(vcf_dir, exist_ok=True)
@@ -359,7 +360,8 @@ def register_callbacks(_app):
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
+                sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
@@ -368,13 +370,15 @@ def register_callbacks(_app):
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
                 drug_annotation_content = create_drug_annotation_section(sample_name)
                 top_10_snps_content = create_top_10_snps_section(sample_name)
+                variants_section_content = create_variants_section(sample_name)
             else:
                 error_msg = plink_result.get('error', 'Unknown error')
                 risk_results = create_risk_results(error_message=error_msg)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
+                sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
@@ -382,12 +386,13 @@ def register_callbacks(_app):
             balance = fetch_user_balance(user_session=user_session)
             visible_style = {**card_style, 'display': 'block'}
             hidden_style = {**card_style, 'display': 'none'}
-            return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
+            sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
+            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", hidden_style, "", visible_style
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
         
-        return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style
+        return risk_results, variants_section_content, user_balance(balance), visible_style, visible_style, visible_style, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style
 
     @_app.callback(
         Output('prediction-history-table', 'children', allow_duplicate=True),
