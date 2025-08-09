@@ -42,6 +42,8 @@ services:
       dockerfile: Dockerfile.frontend
     ports:
       - "9002:9000"
+    volumes:
+      - ./input:/input
     environment:
       - API_URL=http://backend:80/api
       - PLINK_API_URL=http://plink:5000

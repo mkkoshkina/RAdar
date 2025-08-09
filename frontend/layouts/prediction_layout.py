@@ -379,13 +379,13 @@ def create_variants_table(plink_data=None, error_message=None):
     )
 
 def create_variants_section():
-    csv_path = 'input/yet_another_final_PGS000195_metadata.csv'
+    csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
     df = pd.read_csv(csv_path)
     fig = px.scatter(
         df,
-        x='chr_position',
-        y='effect_weight',
-        hover_data={'chr_name': False, 'chr_position': True, 'effect_weight': True},
+        x='Position',
+        y='Effect weight',
+        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True},
     )
 
     fig.update_traces(
