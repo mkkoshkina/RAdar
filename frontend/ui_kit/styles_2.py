@@ -17,8 +17,8 @@ theme_colors = {
 # =========================
 font_styles = {
     'base': '"Inter", "Arial", sans-serif',
-    'heading': '"Poppins", "Helvetica Neue", Arial, sans-serif',
-    'text': '"Open Sans", sans-serif'
+    'heading': '"Inter", "Arial", sans-serif',  # same as base
+    'text': '"Inter", "Arial", sans-serif'
 }
 
 # =========================
