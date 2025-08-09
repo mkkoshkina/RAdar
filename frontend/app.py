@@ -4,7 +4,7 @@ from dash import dcc, html
 from frontend.callbacks.callbacks import register_callbacks
 from frontend.ui_kit.styles import page_content_style
 
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, suppress_callback_exceptions=True, title="RAdar: Rheumatoid Arthritis Predictor")
 server = app.server
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
