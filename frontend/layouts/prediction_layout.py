@@ -12,30 +12,9 @@ from pathlib import Path
 from frontend.data.remote_data import fetch_user_balance, fetch_prediction_history
 from frontend.ui_kit.components.user_balance import user_balance
 from frontend.ui_kit.styles import table_style, table_header_style, table_cell_style, input_style, \
-    dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style
+    dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style, \
+    card_style, upload_style
 from frontend.ui_kit.utils import format_timestamp
-
-card_style = {
-    'backgroundColor': '#ffffff',
-    'padding': '20px',
-    'margin': '10px 0',
-    'borderRadius': '8px',
-    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
-    'border': '1px solid #e0e0e0'
-}
-
-upload_style = {
-    'width': '100%',
-    'height': '60px',
-    'lineHeight': '60px',
-    'borderWidth': '2px',
-    'borderStyle': 'dashed',
-    'borderRadius': '8px',
-    'textAlign': 'center',
-    'margin': '10px 0',
-    'borderColor': '#007bff',
-    'backgroundColor': '#f8f9fa'
-}
 
 risk_colors = {
     'low': '#28a745',
@@ -127,10 +106,10 @@ def genetic_upload_form():
         
         html.Div(id='upload-status', style={'margin': '10px 0'}),
         
-        html.Button('Analyze Rheumatoid Arthritis Risk', id='analyze-button', 
+        html.Button('Analyze Rheumatoid Arthritis Risk', id='analyze-button', className='btn-primary', 
                    style=primary_button_style, disabled=True),
         
-    ], style=card_style)
+    ], className='card', style=card_style)
 
 
 def create_error_display(error_message):
@@ -229,14 +208,14 @@ def create_error_display(error_message):
         
         html.Div([
             html.Button('Try Again', 
-                       id='error-try-again-button',
+                       id='error-try-again-button', className='btn-primary',
                        style={
                            **primary_button_style,
                            'marginTop': '15px'
                        })
         ])
         
-    ], style={
+    ], className='card', style={
         **card_style,
         'border': '2px solid #dc3545',
         'backgroundColor': '#fff5f5'
@@ -708,17 +687,17 @@ def prediction_layout(user_session):
         html.Div([
             html.H3("Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
-        ], style={**card_style, 'display': 'none'}, id='results-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='results-section'),
         
         html.Div([
             html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(create_variants_section())  
-        ], style={**card_style, 'display': 'none'}, id='variants-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
         html.Div([
             html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
-        ], style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
         html.Div([
             html.H3("Drug-Gene Interactions", style={'color': '#333', 'marginBottom': '15px'}),
@@ -732,9 +711,9 @@ def prediction_layout(user_session):
 
         html.Div([
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('Download PDF Report', id='download-pdf-button', 
+            html.Button('Download PDF Report', id='download-pdf-button', className='btn-primary', 
             style=primary_button_style, disabled=True),
-        ], style={**card_style, 'display': 'none'}, id='pdf_report-section')
+        ], className='card', style={**card_style, 'display': 'none'}, id='pdf_report-section')
 
         
         

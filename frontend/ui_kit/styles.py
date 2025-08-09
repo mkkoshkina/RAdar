@@ -1,20 +1,29 @@
-# Theme Colors
+# Enhanced Theme Colors
 theme_colors = {
-    'primary': '#007bff',
-    'secondary': '#343a40',
-    'background': '#ffffff',
-    'accent': '#ffc107',
-    'text': '#495057',
-    'success': '#28a745',
-    'error': '#dc3545',
-    'info': '#17a2b8'
+    'primary': '#2563eb',
+    'primary_light': '#3b82f6', 
+    'primary_dark': '#1d4ed8',
+    'secondary': '#5c4033',        # Keep brown for accents
+    'background': '#faf8f6',       # Warm background
+    'surface': '#ffffff',
+    'accent': '#d4a373',           # Golden-brown accent
+    'text': '#1f1f1f',             # Almost black - primary text
+    'text_medium': '#374151',      # Dark gray - secondary text  
+    'text_light': '#6b7280',       # Medium gray - muted text
+    'success': '#059669',
+    'error': '#dc2626',
+    'warning': '#d97706',
+    'info': '#0284c7',
+    'border': 'rgba(92, 64, 51, 0.15)',
+    'border_light': '#e5e7eb',
+    'shadow': '0 4px 10px rgba(0, 0, 0, 0.05)'
 }
 
 # Base Font Styles
 font_styles = {
-    'base': '"Arial", sans-serif',
-    'heading': '"Helvetica Neue", Arial, sans-serif',
-    'text': '"Open Sans", sans-serif'
+    'base': '"Montserrat", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif',
+    'heading': '"Montserrat", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif',
+    'text': '"Montserrat", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif'
 }
 
 # Base Style
@@ -24,6 +33,16 @@ base_style = {
     'margin': '15px 0',
     'fontFamily': font_styles['base']
 }
+# Enhanced Card Style
+card_style = {
+    'backgroundColor': theme_colors['surface'],
+    'padding': '24px',
+    'margin': '16px 0',
+    'borderRadius': '12px',
+    'boxShadow': theme_colors['shadow'],
+    'border': f'1px solid {theme_colors["border"]}',
+    'transition': 'all 0.3s ease'
+}
 
 # Table Styles
 table_style = {
@@ -31,23 +50,23 @@ table_style = {
     'overflowX': 'auto',
     'border': '1px solid #dee2e6',
     'borderRadius': '0.375rem',
-    'boxShadow': '0 0.5rem 1rem rgba(0, 0, 0, 0.15)',
+    'boxShadow': f'1px solid {theme_colors["border"]}',
     'marginTop': '1rem',
 }
 
 table_header_style = {
-    'color': '#ffffff',
+    'color': theme_colors['surface'],
     'backgroundColor': theme_colors['primary'],
     'fontWeight': 'bold',
     'padding': '1rem',
-    'borderBottom': '2px solid #dee2e6',
+    'borderBottom': f'2px solid {theme_colors["border"]}',
 }
 
 table_cell_style = {
     'backgroundColor': theme_colors['background'],
     'color': theme_colors['text'],
     'padding': '0.75rem',
-    'borderBottom': '1px solid #dee2e6',
+    'borderBottom': f'1px solid {theme_colors["border_light"]}',
     'textAlign': 'left',
     'fontSize': '0.9rem',
 }
@@ -98,16 +117,21 @@ text_style = {
     'fontFamily': font_styles['text'],
 }
 
-heading2_style = {
-    'fontFamily': font_styles['heading'],
+# Modern heading styles
+heading1_style = {
+    'fontSize': '2.5rem',
     'fontWeight': '600',
-    'color': theme_colors['primary'],
-    'textShadow': '0px 1px 2px rgba(0, 0, 0, 0.1)',
-    'marginBottom': '15px',
-    'paddingTop': '10px',
-    'lineHeight': '1.4',
-    'textTransform': 'uppercase',
-    'letterSpacing': '1px',
+    'color': theme_colors['text'],
+    'marginBottom': '1rem',
+    'lineHeight': '1.2'
+}
+
+heading2_style = {
+    'fontSize': '2rem',
+    'fontWeight': '500',
+    'color': theme_colors['text'],
+    'marginBottom': '0.75rem',
+    'lineHeight': '1.3'
 }
 
 heading5_style = {
@@ -125,7 +149,7 @@ heading5_style = {
 # Navigation Styles
 navigation_style = {
     'padding': '20px 15px',
-    'backgroundImage': 'linear-gradient(to right, #6a11cb 0%, #2575fc 100%)',
+    'backgroundImage': 'linear-gradient(to right, #3b82f6 0%, #1d4ed8 100%)',
     'fontSize': '18px',
     'textAlign': 'center',
     'fontWeight': 'bold',
@@ -170,6 +194,19 @@ error_message_style = {
     'display': 'flex',
     'alignItems': 'center',
     'gap': '10px',
+}
+
+upload_style = {
+    'width': '100%',
+    'height': '60px',
+    'lineHeight': '60px',
+    'borderWidth': '2px',
+    'borderStyle': 'dashed',
+    'borderRadius': '8px',
+    'textAlign': 'center',
+    'margin': '10px 0',
+    'borderColor': theme_colors['border'],
+    'backgroundColor': '#f8f9fa'
 }
 
 # Page Content
