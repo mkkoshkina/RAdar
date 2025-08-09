@@ -477,7 +477,7 @@ def register_callbacks(_app):
             
         return base_style
 
-    @app.callback(
+    @_app.callback(
         Output('chat-popup-container', 'style'),
         [Input('open-chat-popup', 'n_clicks'),
         Input('chat-popup-close', 'n_clicks')],
@@ -496,7 +496,7 @@ def register_callbacks(_app):
             style['display'] = 'none'
         return style
 
-    @app.callback(
+    @_app.callback(
         Output('chat-history', 'value'),
         [Input('chat-send-btn', 'n_clicks')],
         [State('chat-input', 'value'),
