@@ -1,0 +1,118 @@
+---
+title: "plots_generation_1"
+author: "Ars"
+date: "2025-08-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+required_cran <- c("tidyverse", "biomaRt")
+required_bioc <- c("GenomicRanges", "rtracklayer", "Gviz")
+
+for (pkg in required_cran) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+}
+
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+for (pkg in required_bioc) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    BiocManager::install(pkg)
+  }
+  library(pkg, character.only = TRUE)
+}
+```
+
+```{r}
+library(tidyverse)
+library(rtracklayer)
+library(GenomicRanges)
+library(Gviz)
+library(biomaRt)
+```
+
+```{r}
+genome <- rtracklayer::import("gencode.v48lift37.basic.annotation.gtf.gz")
+genome <- genome[seqnames(genome) %in% c(paste0("chr", 1:22), "chrX", "chrY") & mcols(genome)$source %in% c("HAVANA") & mcols(genome)$type == "gene" & mcols(genome)$gene_type == "protein_coding"]
+```
+
+```{r}
+snps <- read_tsv("PGS000195_hmPOS_GRCh37.txt", skip = 19)
+snps <- snps %>% dplyr::filter(!is.na(snps$rsID))
+snps$seqnames <- paste0("chr", snps$chr_name)
+snps$chr_name <- NULL
+snps$rs_id <- snps$rsID
+snps$rsID <- NULL
+snps$start <- snps$chr_position
+snps$chr_position <- NULL
+```
+
+```{r}
+features_gr <- genome[, "gene_name"]
+n <- 100000
+mart <- useEnsembl(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+
+for (i in 1:nrow(snps)) {
+  snp <- snps[i, ]
+  OR <- GRanges(seqnames = snp$seqnames, IRanges(snp$start, width = 1), id = snp$rs_id)
+  region <- features_gr[seqnames(features_gr) == snp$seqnames & start(features_gr) >= snp$start - n & end(features_gr) <= snp$start + n]
+  
+  atrack <- AnnotationTrack(region, id = mcols(region)$gene_name, name = "Genes")
+  displayPars(atrack) <- list(
+    min.height = 0.1,         
+    lex = 0.8,              
+    cex = 0.7,              
+    cex.feature = 0.5,      
+    fontcolor.feature = "black",
+    fontsize = 13)
+    
+  itrack <- IdeogramTrack(genome = "hg19", chromosome = snp$seqnames)
+  gtrack <- GenomeAxisTrack(name = "scale")
+  
+  snpTrack <- AnnotationTrack(
+  range = OR,
+  name = "SNP",
+  shape = "triangle")
+  
+  displayPars(snpTrack) <- list(
+    col = "red", 
+    fill = "red",
+    showFeatureId = TRUE,
+    featureAnnotation = "id",
+    cex = 0.8,
+    fontcolor.feature = "black",
+    fontsize = 10)
+  
+  png(paste0("plots_1/", snp$rs_id, ".png"), width = 2000, height = 400, res = 150) 
+  
+  plotTracks(
+    list(itrack, gtrack, snpTrack, atrack),
+    collapseTranscripts = TRUE, 
+    shape = "arrow", 
+    transcriptAnnotation = "symbol",
+    from = snp$start - n, to = snp$start + n,
+    featureAnnotation = "id",
+    sizes = c(0.10, 0.06, 0.01, 0.05), 
+    margin = 30)
+  
+  dev.off()
+  
+  if (length(region) != 0) {
+    genes <- mcols(region)$gene_name
+    attrs <- c("external_gene_name", "description", "entrezgene_id")
+    res <- getBM(attributes=attrs, filters="external_gene_name", values=genes, mart=mart)
+    res$ncbi_gene_page <- paste0("https://www.ncbi.nlm.nih.gov/datasets/gene/", res$entrezgene_id, "/")
+    res$genomic_browser <- paste0("https://www.ncbi.nlm.nih.gov/gdv/browser/gene/?id=", res$entrezgene_id)
+    names(res) <- c("Gene Symbol", "Description", "Entrez ID", "NCBI Gene Page", "Genomic Browser")
+    write_tsv(res, paste0("anno_1/", snp$rs_id, ".tsv"))
+  }
+}
+```
