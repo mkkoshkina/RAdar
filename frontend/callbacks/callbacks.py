@@ -24,6 +24,8 @@ from frontend.ui_kit.components.error_message import error_message
 from frontend.ui_kit.components.navigation import navigation_bar
 from frontend.ui_kit.components.user_balance import user_balance
 
+from frontend.data.remote_data import send_chat_message
+
 sign_page_last_click_timestamp = datetime.now()
 
 
@@ -474,3 +476,37 @@ def register_callbacks(_app):
             base_style['display'] = 'block'
             
         return base_style
+
+    @app.callback(
+        Output('chat-popup-container', 'style'),
+        [Input('open-chat-popup', 'n_clicks'),
+        Input('chat-popup-close', 'n_clicks')],
+        [State('chat-popup-container', 'style')],
+        prevent_initial_call=True
+    )
+    def toggle_chat_popup(open_clicks, close_clicks, current_style):
+        ctx = callback_context
+        if not ctx.triggered:
+            raise PreventUpdate
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        style = current_style or {}
+        if button_id == 'open-chat-popup':
+            style['display'] = 'block'
+        elif button_id == 'chat-popup-close':
+            style['display'] = 'none'
+        return style
+
+    @app.callback(
+        Output('chat-history', 'value'),
+        [Input('chat-send-btn', 'n_clicks')],
+        [State('chat-input', 'value'),
+        State('chat-history', 'value'),
+        State('user-session', 'data')],
+        prevent_initial_call=True
+    )
+    def update_chat(n_clicks, user_message, chat_history, user_session):
+        if not user_message:
+            raise PreventUpdate
+        reply = send_chat_message(user_message, user_session)
+        new_history = (chat_history or '') + f"\nYou: {user_message}\nBot: {reply}"
+        return new_history
