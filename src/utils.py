@@ -46,16 +46,18 @@ def create_prs_table(
     full_score_path,
     afreq_path,
     bfile_prefix,
+    sample,
     output_dir="output",
     clean_tmp_files=True
 ):
     os.makedirs(output_dir, exist_ok=True)
-    log_file = os.path.join(output_dir, "create_table_with_used_snps.log")
+    # Prefix log file with sample name
+    log_file = os.path.join(output_dir, f"{sample}_create_table_with_used_snps.log")
 
     log_message("Starting PRS table creation pipeline", log_file)
 
     # 1. Subset score file using grep
-    subset_score_path = os.path.join(output_dir, "subset_score.txt")
+    subset_score_path = os.path.join(output_dir, f"{sample}_subset_score.txt")
     grep_cmd = [
         "grep", "-Fwf", sscore_vars_path, full_score_path
     ]
@@ -68,7 +70,8 @@ def create_prs_table(
     log_message(f"Subset score file created at {subset_score_path}", log_file)
 
     # 2. Extract genotypes using plink2
-    plink_out_prefix = os.path.join(output_dir, "lm5515_dedup_prs_snpsVCF_BCF")
+    plink_out_prefix = os.path.join(output_dir, f"{sample}_plink_extract")
+    os.makedirs(os.path.dirname(plink_out_prefix), exist_ok=True)
     plink_cmd = [
         "plink2", "--bfile", bfile_prefix,
         "--extract", sscore_vars_path,
@@ -80,7 +83,6 @@ def create_prs_table(
     if result.returncode != 0:
         log_message("plink2 command failed", log_file)
         raise RuntimeError("plink2 command failed")
-    log_message(f"PLINK2 .raw file created at {plink_out_prefix + '.raw'}", log_file)
 
     # 3. Read subset_score.txt
     log_message("Reading subset score file", log_file)
@@ -124,7 +126,7 @@ def create_prs_table(
     merged = merged[["rsid", "ref", "effect_allele", "effect_size", "ALT_FREQS", "genotype"]]
 
     # 8. Save to file
-    final_table_path = os.path.join(output_dir, "final_prs_table.tsv")
+    final_table_path = os.path.join(output_dir, f"{sample}_final_prs_table.tsv")
     merged.to_csv(final_table_path, sep="\t", index=False)
     log_message(f"Done! Output written to {final_table_path}", log_file)
 
@@ -143,6 +145,7 @@ def create_prs_table(
         log_message("Temporary files removed.", log_file)
 
     return merged
+
 def read_vcf_as_df(vcf_path: str) -> pd.DataFrame:
     # Grab real header (so we capture sample column names)
     with open(vcf_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -172,7 +175,13 @@ def read_vcf_as_df(vcf_path: str) -> pd.DataFrame:
 
     return df
 
-def intersect_vcf_with_tsv(vcf_path: str, tsv_path: str, out_csv: str) -> pd.DataFrame:
+def intersect_vcf_with_tsv(vcf_path: str, tsv_path: str, out_csv: str, sample: str) -> pd.DataFrame:
+    # Prefix the output file with the sample name if not already present
+    out_dir = Path(out_csv).parent
+    out_name = Path(out_csv).name
+    if not out_name.startswith(f"{sample}_"):
+        out_csv = str(out_dir / f"{sample}_{out_name}")
+
     # Read inputs
     vcf_df = read_vcf_as_df(vcf_path)
 
@@ -194,6 +203,8 @@ def intersect_vcf_with_tsv(vcf_path: str, tsv_path: str, out_csv: str) -> pd.Dat
     Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
     merged.to_csv(out_csv, index=False)
     return merged
+
+
 def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     # Set up paths
     if assembly == "GRCh38":
@@ -205,7 +216,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     else:
         raise ValueError(f"Unknown ASSEMBLY: {assembly}")
     
-    drug_annotations_path = "input\annotations\drug_toxicity_annotations.tsv"
+    drug_annotations_path = "input/annotations/drug_toxicity_annotations.tsv"
     sample = os.path.basename(input_vcf).replace('.vcf', '')
     log_dir = "log"
     os.makedirs(log_dir, exist_ok=True)
@@ -264,7 +275,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     step_start = datetime.now()
     result = subprocess.run([
         'plink2', '--bfile', f"{plink_prefix}_dedup", '--read-freq', freq_path,
-        '--score', prs_path, '1', '4', '6', 'header', 'list-variants',
+        '--score', prs_path, '1', '4', '6', 'header', 'list-variants', 'no-mean-imputation',
         '--out', f"{plink_prefix}_dedup.prs"
     ], capture_output=True, text=True)
     if result.returncode != 0:
@@ -284,11 +295,16 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         afreq_path=freq_path,
         bfile_prefix=f"{plink_prefix}_dedup",
         output_dir="output",
-        clean_tmp_files=clean_tmp_files
+        clean_tmp_files=clean_tmp_files,
+        sample=sample
     )
 
     #Step 6.5: Parse supplementary mutations
-    intersect_vcf_with_tsv(input_vcf, drug_annotations_path, "output/intersection_with_drug_annotation.csv")
+    intersect_vcf_with_tsv(
+        input_vcf,
+        drug_annotations_path,
+        f"output/{sample}_intersection_with_drug_annotation.csv",
+        sample)
 
     # Step 7: Clean up
     if clean_tmp_files:
@@ -310,3 +326,4 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
     
     return output_json_data
+
