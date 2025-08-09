@@ -8,7 +8,6 @@ def health_check():
     """Health check endpoint"""
     return jsonify({"status": "healthy", "service": "plink-predictor"})
 
-
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()

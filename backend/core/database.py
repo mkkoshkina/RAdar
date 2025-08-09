@@ -4,6 +4,7 @@ from typing import Callable
 from sqlalchemy import create_engine, orm
 from sqlalchemy.orm import Session
 
+from backend.model.user import User
 
 
 class Database:
