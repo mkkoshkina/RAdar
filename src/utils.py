@@ -143,17 +143,6 @@ def create_prs_table(
         log_message("Temporary files removed.", log_file)
 
     return merged
-
-# Example usage:
-# create_prs_table(
-#     sscore_vars_path="input/plink/lm5515_dedup.prs.sscore.vars",
-#     full_score_path="input/prs/PGS000195_hmPOS_GRCh37.txt",
-#     afreq_path="input/prs/PGS000195_hmPOS_GRCh37.freq",
-#     bfile_prefix="input/plink/lm5515_dedup",
-#     output_dir="output",
-#     clean_tmp_files=True
-# )
-
 def read_vcf_as_df(vcf_path: str) -> pd.DataFrame:
     # Grab real header (so we capture sample column names)
     with open(vcf_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -205,10 +194,6 @@ def intersect_vcf_with_tsv(vcf_path: str, tsv_path: str, out_csv: str) -> pd.Dat
     Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
     merged.to_csv(out_csv, index=False)
     return merged
-
-# Example usage:
-#intersect_vcf_with_tsv("lm5515.vcf", "annotations.tsv", "intersection.csv")
-
 def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     # Set up paths
     if assembly == "GRCh38":
@@ -219,6 +204,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         freq_path = "input/prs/PGS000195_hmPOS_GRCh37.freq"
     else:
         raise ValueError(f"Unknown ASSEMBLY: {assembly}")
+    
     drug_annotations_path = "input\annotations\drug_toxicity_annotations.tsv"
     sample = os.path.basename(input_vcf).replace('.vcf', '')
     log_dir = "log"
@@ -301,10 +287,10 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         clean_tmp_files=clean_tmp_files
     )
 
-    #Step 5.5: Parse supplementary mutations
+    #Step 6.5: Parse supplementary mutations
     intersect_vcf_with_tsv(input_vcf, drug_annotations_path, "output/intersection_with_drug_annotation.csv")
 
-    # Step 6: Clean up
+    # Step 7: Clean up
     if clean_tmp_files:
         log_message("Cleaning up temporary files...", log_file)
         temp_files = [
@@ -324,10 +310,3 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
     
     return output_json_data
-
-
-# run_plink_pipeline(
-#     input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
-#     # assembly='GRCh37',
-#     clean_tmp_files=False
-# )
