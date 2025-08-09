@@ -396,6 +396,8 @@ def create_variants_section():
     if 'Sources' in df.columns:
         df['Sources'] = df['Sources'].apply(format_links)
 
+    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
+
     fig = px.scatter(
         df,
         x='Position',
