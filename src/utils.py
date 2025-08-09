@@ -230,7 +230,12 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         raise RuntimeError("PLINK2 PRS calculation failed")
     log_message(f"PRS calculated in {(datetime.now() - step_start).total_seconds():.1f} seconds", log_file)
 
-    # Step 5: Table with used snps
+    # Step 5: Save output
+    output_json_data = parse_profile_file(f"{plink_prefix}_dedup.prs.sscore")
+    with open(output_json, "w") as f:
+        json.dump(output_json_data, f, indent=2)
+        
+    # Step 6: Table with used snps
     create_prs_table(
         sscore_vars_path=f"{plink_prefix}_dedup.prs.sscore.vars",
         full_score_path=prs_path,
@@ -240,7 +245,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         clean_tmp_files=clean_tmp_files
     )
 
-    # Step 6: Clean up
+    # Step 7: Clean up
     if clean_tmp_files:
         log_message("Cleaning up temporary files...", log_file)
         temp_files = [
@@ -261,7 +266,8 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     return {"status": "success", "output_json": output_json, "log_file": log_file, "table_snps_used" : "output/final_prs_table.tsv"}
 
 
-# run_plink_pipeline(
-#     input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
-#     assembly='GRCh37'
-# )
+run_plink_pipeline(
+    input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
+    # assembly='GRCh37',
+    clean_tmp_files=False
+)
