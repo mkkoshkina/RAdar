@@ -1,3 +1,4 @@
+from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 from jose import jwt
 from pydantic import ValidationError
@@ -6,6 +7,9 @@ from backend.core.config import configs
 from backend.core.container import Container
 from backend.core.exceptions import AuthError
 from backend.core.security import ALGORITHM, JWTBearer
+from backend.schema.user_schema import BaseUser
+from backend.schema.auth_schema import Payload
+from backend.services.user_service import UserService
 
 
 @inject
