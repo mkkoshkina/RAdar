@@ -15,7 +15,7 @@ def log_message(msg, log_file=None):
     if log_file:
         with open(log_file, 'a') as f:
             f.write(log_msg + '\n')
-        
+
 def parse_profile_file(input_path):
     with open(input_path) as f:
         lines = [line.strip() for line in f if line.strip()]
@@ -83,6 +83,7 @@ def create_prs_table(
     if result.returncode != 0:
         log_message("plink2 command failed", log_file)
         raise RuntimeError("plink2 command failed")
+
 
     # 3. Read subset_score.txt
     log_message("Reading subset score file", log_file)
@@ -155,10 +156,10 @@ def read_vcf_as_df(vcf_path: str) -> pd.DataFrame:
                 break
         else:
             header = ['CHROM','POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'sample']
-    
+
     if header[-1] != "sample":
         header[-1] = "sample"
-    
+
     df = pd.read_csv(
         vcf_path,
         sep="\t",
@@ -215,7 +216,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         freq_path = "input/prs/PGS000195_hmPOS_GRCh37.freq"
     else:
         raise ValueError(f"Unknown ASSEMBLY: {assembly}")
-    
+
     drug_annotations_path = "input/annotations/drug_toxicity_annotations.tsv"
     sample = os.path.basename(input_vcf).replace('.vcf', '')
     log_dir = "log"
@@ -287,7 +288,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     output_json_data = parse_profile_file(f"{plink_prefix}_dedup.prs.sscore")
     with open(output_json, "w") as f:
         json.dump(output_json_data, f, indent=2)
-        
+
     # Step 6: Table with used snps
     create_prs_table(
         sscore_vars_path=f"{plink_prefix}_dedup.prs.sscore.vars",
@@ -324,6 +325,5 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     total_duration = (datetime.now() - start_time).total_seconds()
     log_message(f"Done. Output at {output_json}", log_file)
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
-    
-    return output_json_data
 
+    return output_json_data

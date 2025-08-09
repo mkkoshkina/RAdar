@@ -383,9 +383,9 @@ def create_variants_section():
     df = pd.read_csv(csv_path)
     fig = px.scatter(
         df,
-        x='chr_position',
-        y='effect_weight',
-        hover_data={'chr_name': False, 'chr_position': True, 'effect_weight': True},
+        x='Position',
+        y='Effect weight',
+        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True},
     )
 
     fig.update_traces(

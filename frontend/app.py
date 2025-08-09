@@ -2,6 +2,7 @@ import dash
 from dash import dcc, html
 
 from frontend.callbacks.callbacks import register_callbacks
+from frontend.ui_kit.styles import page_content_style
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 server = app.server
