@@ -439,7 +439,25 @@ def create_variants_section(sample):
             'position': 'relative',
             'width': '800px',
             'height': '650px'
-        })
+        }),
+
+        html.Div([
+                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.Ul([
+                    html.Li("This section shows the genetic variants associated with rheumatoid arthritis, each point represents a mutation"),
+                    html.Li("The x-axis shows the genomic position of the variant, y-axis shows the effect size of the variant on rheumatoid arthritis risk"),
+                    html.Li(["Red points indicate variants present in", html.B("your genetic data")]),
+                    html.Li("If you hover over a point, you will see more information about the variant"),
+                    html.Li("The table below the plot shows detailed information about the variants, such as the gene name and symbol, chromosome, position and etc."),
+                    html.Li([html.B("You can click on the links in the Sources column to learn more about each variant")])
+                ], style={'color': '#666', 'fontSize': '14px'})
+            ], style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '15px',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+                'border': '1px solid #e9ecef'
+            })
     ])
 
 
@@ -687,7 +705,7 @@ def prediction_layout(user_session):
     predictions = fetch_prediction_history(user_session)
     
     return html.Div([
-        html.H1("Rheumatoid Arthritis Polydenic Risk Score Prediction", 
+        html.H1("Rheumatoid Arthritis Polygenic Risk Score Prediction", 
                 style={'textAlign': 'center', 'color': '#333', 'marginBottom': '30px'}),
         
         html.Div(user_balance(balance), id='current-balance-predictions'),
