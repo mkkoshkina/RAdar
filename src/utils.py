@@ -6,6 +6,7 @@ import sys
 import os
 import pandas as pd
 import subprocess
+from pathlib import Path
 
 def log_message(msg, log_file=None):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -153,6 +154,61 @@ def create_prs_table(
 #     clean_tmp_files=True
 # )
 
+def read_vcf_as_df(vcf_path: str) -> pd.DataFrame:
+    # Grab real header (so we capture sample column names)
+    with open(vcf_path, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            if line.startswith("#CHROM"):
+                header = line.lstrip("#").strip().split("\t")
+                break
+        else:
+            header = ['CHROM','POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'sample']
+    
+    if header[-1] != "sample":
+        header[-1] = "sample"
+    
+    df = pd.read_csv(
+        vcf_path,
+        sep="\t",
+        comment="#",
+        names=header,
+        dtype=str,
+        engine="c",
+    )
+    if "#CHROM" in df.columns:
+        df = df.rename(columns={"#CHROM": "CHROM"})
+
+    df["ID"] = df["ID"].fillna("").str.lower()
+    df.loc[~df["ID"].str.startswith("rs"), "ID"] = "rs" + df["ID"]
+
+    return df
+
+def intersect_vcf_with_tsv(vcf_path: str, tsv_path: str, out_csv: str) -> pd.DataFrame:
+    # Read inputs
+    vcf_df = read_vcf_as_df(vcf_path)
+
+    ann = pd.read_csv(tsv_path, sep="\t", dtype=str).fillna("")
+    # Normalize rsID case for safe join
+    vcf_df["ID"] = vcf_df["ID"].str.strip().str.lower()
+    ann["Variant"] = ann["Variant"].str.strip().str.lower()
+
+    # If TSV can have duplicate rows per rsID, keep first (or change to aggregate if you prefer)
+    ann = ann.drop_duplicates(subset=["Variant"], keep="first")
+
+    merged = vcf_df.merge(
+        ann,
+        left_on="ID",
+        right_on="Variant",
+        how="inner",
+        copy=False,
+    )
+    Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
+    merged.to_csv(out_csv, index=False)
+    return merged
+
+# Example usage:
+#intersect_vcf_with_tsv("lm5515.vcf", "annotations.tsv", "intersection.csv")
+
 def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     # Set up paths
     if assembly == "GRCh38":
@@ -163,7 +219,7 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         freq_path = "input/prs/PGS000195_hmPOS_GRCh37.freq"
     else:
         raise ValueError(f"Unknown ASSEMBLY: {assembly}")
-
+    drug_annotations_path = "input\annotations\drug_toxicity_annotations.tsv"
     sample = os.path.basename(input_vcf).replace('.vcf', '')
     log_dir = "log"
     os.makedirs(log_dir, exist_ok=True)
@@ -239,6 +295,9 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         output_dir="output",
         clean_tmp_files=clean_tmp_files
     )
+
+    #Step 5.5: Parse supplementary mutations
+    intersect_vcf_with_tsv(input_vcf, drug_annotations_path, "output/intersection_with_drug_annotation.csv")
 
     # Step 6: Clean up
     if clean_tmp_files:
