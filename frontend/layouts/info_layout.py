@@ -1,5 +1,5 @@
 from dash import dcc, html
-from frontend.ui_kit.styles import primary_button_style, text_style
+from frontend.ui_kit.styles import primary_button_style, text_style, secondary_button_style
 
 INFO_MD = """
 # Understanding Your Polygenic Risk Score (PGS)
@@ -68,11 +68,11 @@ def info_layout(user_session=None):
             html.Div(
                 [
                     html.A(
-                        html.Button("Upload VCF", style=primary_button_style, id="info-upload-cta"),
+                        html.Button("Upload VCF", className='btn-primary', style=primary_button_style, id="info-upload-cta"),
                         href="/analyze",
                     ),
                     html.A(
-                        html.Button("Back to Home", style={**primary_button_style, "marginLeft": "10px"}),
+                        html.Button("Back to Home", className='btn-primary', style={**secondary_button_style, "marginLeft": "10px"}),
                         href="/",
                     ),
                 ],

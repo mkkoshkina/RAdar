@@ -103,11 +103,12 @@ def hero_section(app_name: str):
         html.Div(
             [
                 dcc.Link(
-                    html.Button("Upload VCF & Analyze", id="home-upload-cta", n_clicks=0, style=primary_button_style),
+                    html.Button("Upload VCF & Analyze", id="home-upload-cta", n_clicks=0,
+                                className='btn-primary', style=primary_button_style),
                     href="/analyze",
                 ),
                 dcc.Link(
-                    html.Button("View Documentation", id="home-docs-cta", n_clicks=0, style=secondary_button_style),
+                    html.Button("View Information", id="home-docs-cta", n_clicks=0, className='btn-primary', style=secondary_button_style),
                     href="/docs",
                 ),
             ],

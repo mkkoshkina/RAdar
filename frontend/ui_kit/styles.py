@@ -151,7 +151,7 @@ heading5_style = {
 # Navigation Styles
 navigation_style = {
     'padding': '20px 15px',
-    'backgroundColor': theme_colors['accent'],
+    'backgroundColor': theme_colors['primary_light'],
     'fontSize': '18px',
     'textAlign': 'center',
     'fontWeight': 'bold',
