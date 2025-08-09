@@ -27,4 +27,3 @@ def sign_in_layout():
         sign_in_form(),
         html.Div(id="sign-in-status", style=text_style)
     ], style={'maxWidth': '500px', 'margin': '0 auto', 'padding': '20px'})
-
