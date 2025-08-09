@@ -4,7 +4,9 @@ theme_colors = {
     'primary_light': '#3b82f6', 
     'primary_dark': '#1d4ed8',
     'secondary': '#5c4033',        # Keep brown for accents
-    'background': '#faf8f6',       # Warm background
+    'background': '#faf8f6',
+    'background_gray': '#e2e3e5',
+    'background_light_gray':  '#f8f9fa',
     'surface': '#ffffff',
     'accent': '#d4a373',           # Golden-brown accent
     'text': '#1f1f1f',             # Almost black - primary text
@@ -149,7 +151,7 @@ heading5_style = {
 # Navigation Styles
 navigation_style = {
     'padding': '20px 15px',
-    'backgroundImage': 'linear-gradient(to right, #3b82f6 0%, #1d4ed8 100%)',
+    'backgroundColor': theme_colors['accent'],
     'fontSize': '18px',
     'textAlign': 'center',
     'fontWeight': 'bold',
@@ -175,7 +177,7 @@ navigation_separator_style = {
 user_balance_style = {
     **base_style,
     'color': theme_colors['secondary'],
-    'backgroundColor': '#e2e3e5',
+    'backgroundColor': theme_colors['background_light_gray'],
     'padding': '10px 20px',
     'borderRadius': '5px',
     'fontWeight': 'bold',
@@ -188,7 +190,7 @@ error_message_style = {
     'padding': '12px',
     'border': f"1px solid {theme_colors['error']}",
     'color': theme_colors['error'],
-    'backgroundColor': '#fff3cd',
+    'backgroundColor': theme_colors['background_light_gray'],
     'borderRadius': '5px',
     'fontWeight': 'bold',
     'display': 'flex',
@@ -205,8 +207,8 @@ upload_style = {
     'borderRadius': '8px',
     'textAlign': 'center',
     'margin': '10px 0',
-    'borderColor': theme_colors['border'],
-    'backgroundColor': '#f8f9fa'
+    'borderColor': theme_colors['primary_light'],
+    'backgroundColor': theme_colors['background_gray'],
 }
 
 # Page Content
