@@ -379,7 +379,7 @@ def create_variants_table(plink_data=None, error_message=None):
     )
 
 def create_variants_section():
-    csv_path = 'input/yet_another_final_PGS000195_metadata.csv'
+    csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
     df = pd.read_csv(csv_path)
     fig = px.scatter(
         df,
