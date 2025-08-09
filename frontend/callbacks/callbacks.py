@@ -17,7 +17,7 @@ from frontend.layouts.admin_layout import users_report, predictions_report, cred
 from frontend.layouts.billing_layout import billing_layout
 from frontend.layouts.billing_layout import transaction_history_table
 from frontend.layouts.prediction_layout import prediction_layout, \
-    snp_dandelion_plot, create_risk_results, create_variants_section, card_style
+    snp_dandelion_plot, create_risk_results, create_variants_section, card_style, create_drug_annotation_section
 from frontend.layouts.sign_in_layout import sign_in_layout
 from frontend.layouts.sign_up_layout import sign_up_layout
 from frontend.ui_kit.components.error_message import error_message
@@ -306,6 +306,8 @@ def register_callbacks(_app):
          Output('results-section', 'style'),
          Output('variants-section', 'style'),
          Output('snp_dandelion-section', 'style'),
+         Output('drug-annotation-section', 'style'),
+         Output('drug-annotation-content', 'children'),
          Output('pdf_report-section', 'style')],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
@@ -327,7 +329,8 @@ def register_callbacks(_app):
                 risk_results = create_risk_results(error_message=error_msg)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
+                hidden_style = {**card_style, 'display': 'none'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", visible_style
             
             vcf_dir = 'input/vcf'
             os.makedirs(vcf_dir, exist_ok=True)
@@ -342,29 +345,35 @@ def register_callbacks(_app):
                 risk_results = create_risk_results(error_message=error)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
+                hidden_style = {**card_style, 'display': 'none'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", visible_style
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
                 risk_results = create_risk_results(plink_data)
+                
+                sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
+                drug_annotation_content = create_drug_annotation_section(sample_name)
             else:
                 error_msg = plink_result.get('error', 'Unknown error')
                 risk_results = create_risk_results(error_message=error_msg)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
-                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
+                hidden_style = {**card_style, 'display': 'none'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", visible_style
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
             risk_results = create_risk_results(error_message=error_msg)
             balance = fetch_user_balance(user_session=user_session)
             visible_style = {**card_style, 'display': 'block'}
-            return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
+            hidden_style = {**card_style, 'display': 'none'}
+            return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, hidden_style, "", visible_style
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
         
-        return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
+        return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style, drug_annotation_content, visible_style
 
     @_app.callback(
         Output('prediction-history-table', 'children', allow_duplicate=True),

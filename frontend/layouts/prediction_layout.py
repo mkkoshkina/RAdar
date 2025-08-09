@@ -503,6 +503,136 @@ def snp_dandelion_plot():
 def top_10_snps():
     return html.Div('Here be the top_10_snps')
 
+def create_variants_table(plink_data=None, error_message=None):
+
+    if error_message:
+        return html.Div()
+    
+    if plink_data:
+        snps_total = plink_data.get('number_of_alleles_observed', 0)
+        snps_used = plink_data.get('number_of_alleles_detected', 0)
+        
+        return html.Div([
+            html.H5("Polygenic Risk Score Analysis Summary", style={'margin': '15px 0 10px 0'}),
+            html.Div([
+                html.P(f"Total SNPs found in your data: {snps_total:,}"),
+                html.P(f"SNPs used in risk calculation: {snps_used:,}"),
+                html.P(f"Coverage: {(snps_used/snps_total*100):.1f}%" if snps_total > 0 else "Coverage: N/A"),
+                html.P("Risk score calculated using PGS002769 (Rheumatoid Arthritis)")
+            ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '5px'})
+        ])
+    
+    variants_data = [
+        {"Gene": "HLA-DRB1", "Variant": "rs2395029", "Risk Allele": "G", 
+         "Your Genotype": random.choice(["GG", "GT", "TT"]), 
+         "Effect": "Increased RA risk"},
+        {"Gene": "PTPN22", "Variant": "rs2476601", "Risk Allele": "T", 
+         "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+         "Effect": "Autoimmune susceptibility"},
+        {"Gene": "IL1RN", "Variant": "rs419598", "Risk Allele": "T", 
+         "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+         "Effect": "Inflammatory response"},
+        {"Gene": "COL1A1", "Variant": "rs1800012", "Risk Allele": "T", 
+         "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+         "Effect": "Cartilage structure"}
+    ]
+    
+    return dash_table.DataTable(
+        columns=[{"name": col, "id": col} for col in variants_data[0].keys()],
+        data=variants_data,
+        style_table=table_style,
+        style_cell=table_cell_style,
+        style_header=table_header_style,
+        style_data_conditional=[
+            {
+                'if': {'filter_query': '{Risk Allele} = {Your Genotype}'},
+                'backgroundColor': '#ffe6e6',
+                'color': 'black',
+            }
+        ]
+    )
+
+def create_drug_annotation_section(sample):
+    csv_path = f'output/{sample}_intersection_with_drug_annotation.csv'
+    
+    try:
+        if not Path(csv_path).exists():
+            return html.Div([
+                html.P(f"Drug annotation file not found: {csv_path}", 
+                       style={'color': '#dc3545', 'fontStyle': 'italic'})
+            ])
+        
+        df = pd.read_csv(csv_path)
+
+        required_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        df.rename(columns={"CHROM": "Chromosome", "POS": "Position", "ID_x": "SNP ID", "REF": "Reference Allele", "ALT": "Alternate Allele"}, inplace=True)
+        available_columns = [col for col in required_columns if col in df.columns]
+        
+        if not available_columns:
+            return html.Div([
+                html.P("Required columns not found in the drug annotation file.", 
+                       style={'color': '#dc3545', 'fontStyle': 'italic'})
+            ])
+        
+        df_filtered = df[available_columns].copy()
+        
+        df_filtered = df_filtered.dropna(how='all')
+        
+        if df_filtered.empty:
+            return html.Div([
+                html.P("No drug annotation data available for display.", 
+                       style={'color': '#666', 'fontStyle': 'italic'})
+            ])
+        
+        return html.Div([
+            html.P(f"Showing {len(df_filtered)} drug-gene interactions from your genetic data", 
+                   style={'marginBottom': '15px', 'color': '#666'}),
+            
+            dash_table.DataTable(
+                columns=[
+                    {'name': col, 'id': col} for col in df_filtered.columns
+                ],
+                data=df_filtered.to_dict('records'),
+                style_table={
+                    'maxHeight': '400px', 
+                    'overflowY': 'auto', 
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd'
+                },
+                style_cell={
+                    'textAlign': 'left', 
+                    'padding': '8px', 
+                    'fontFamily': 'Arial', 
+                    'fontSize': '13px',
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+                style_header={
+                    'fontWeight': 'bold', 
+                    'backgroundColor': '#f8f9fa', 
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd'
+                },
+                style_data={
+                    'border': '1px solid #ddd'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': '#f9f9f9'
+                    }
+                ],
+                page_size=20,  
+                sort_action="native", 
+                filter_action="native" 
+            )
+        ])
+        
+    except Exception as e:
+        return html.Div([
+            html.P(f"Error loading drug annotation data: {str(e)}", 
+                   style={'color': '#dc3545', 'fontStyle': 'italic'})
+        ])
 
 def prediction_layout(user_session):
     balance = fetch_user_balance(user_session)
@@ -532,10 +662,9 @@ def prediction_layout(user_session):
         ], style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
         html.Div([
-            html.H3("Intersection with drug annotations table", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('', id='', 
-            style=primary_button_style, disabled=True),
-        ], style={**card_style, 'display': 'none'}, id='pdf_report-section'),
+            html.H3("Drug-Gene Interactions", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Div(id='drug-annotation-content')
+        ], style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
 
 
 
