@@ -14,7 +14,7 @@ def predict():
     vcf_file = data.get('vcf_file')
     # assembly = data.get('assembly')
     assembly='GRCh37'
-    clean_tmp = data.get('clean_tmp', True)
+    clean_tmp = data.get('clean_tmp')
     if not vcf_file or not assembly:
         return jsonify({"error": "vcf_file and assembly are required"}), 400
     try:

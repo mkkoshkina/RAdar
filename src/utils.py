@@ -33,13 +33,13 @@ def parse_profile_file(input_path):
             if k == "IID":
                 out["id"] = v
             elif k == "ALLELE_CT":
-                out["number_of_snps"] = int(v)
+                out["number_of_alleles_observed"] = int(v)
             elif k == "NAMED_ALLELE_DOSAGE_SUM":
-                out["number_of_snps_used"] = int(v)
+                out["number_of_alleles_detected"] = int(v)
             elif k == "SCORE1_AVG":
                 out["score"] = float(v)
         records.append(out)
-    return json.dumps(records, indent=2)
+    return records
 
 def create_prs_table(
     sscore_vars_path,
@@ -286,7 +286,12 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
         raise RuntimeError("PLINK2 PRS calculation failed")
     log_message(f"PRS calculated in {(datetime.now() - step_start).total_seconds():.1f} seconds", log_file)
 
-    # Step 5: Table with used snps
+    # Step 5: Save output
+    output_json_data = parse_profile_file(f"{plink_prefix}_dedup.prs.sscore")
+    with open(output_json, "w") as f:
+        json.dump(output_json_data, f, indent=2)
+        
+    # Step 6: Table with used snps
     create_prs_table(
         sscore_vars_path=f"{plink_prefix}_dedup.prs.sscore.vars",
         full_score_path=prs_path,
@@ -317,10 +322,12 @@ def run_plink_pipeline(input_vcf, assembly='GRCh37', clean_tmp_files=True):
     total_duration = (datetime.now() - start_time).total_seconds()
     log_message(f"Done. Output at {output_json}", log_file)
     log_message(f"Total runtime: {total_duration:.1f} seconds", log_file)
-    return {"status": "success", "output_json": output_json, "log_file": log_file, "table_snps_used" : "output/final_prs_table.tsv"}
+    
+    return output_json_data
 
 
 # run_plink_pipeline(
 #     input_vcf='/Users/m.trofimov/Dropbox/Study/bioinf_hackathon/2025/arthritis_prs/RAdar/input/vcf/lm5515.vcf',
-#     assembly='GRCh37'
+#     # assembly='GRCh37',
+#     clean_tmp_files=False
 # )
