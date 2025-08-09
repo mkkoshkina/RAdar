@@ -32,9 +32,9 @@ def parse_profile_file(input_path):
             if k == "IID":
                 out["id"] = v
             elif k == "ALLELE_CT":
-                out["number_of_snps"] = int(v)
+                out["number_of_alleles_observed"] = int(v)
             elif k == "NAMED_ALLELE_DOSAGE_SUM":
-                out["number_of_snps_used"] = int(v)
+                out["number_of_alleles_detected"] = int(v)
             elif k == "SCORE1_AVG":
                 out["score"] = float(v)
         records.append(out)
