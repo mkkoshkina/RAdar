@@ -414,7 +414,7 @@ def create_variants_section():
                 style={'width': '800px', 'height': '500px', 'flexShrink': 0}  
             ),
             html.Div([
-                html.H4("Hovered Variant Info", style={'marginBottom': '8px', 'fontSize': '16px', 'color': '#333'}),
+                html.H4("Variant Info", style={'marginBottom': '8px', 'fontSize': '16px', 'color': '#333'}),
                 dash_table.DataTable(
                     id='hover-info-table',
                     columns=[
@@ -516,6 +516,11 @@ def prediction_layout(user_session):
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
         ], style=card_style, id='snp_dandelion-section'),
 
+        html.Div([
+            html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Button('Download PDF Report', id='download-pdf-button', 
+            style=primary_button_style, disabled=True),
+        ], style=card_style, id='pdf_report-section')
 
 
         # html.Div([
