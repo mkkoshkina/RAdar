@@ -112,7 +112,7 @@ def call_plink_prediction(vcf_filename):
 def send_chat_message(message, user_session=None):
     client = APIClient()
     token = user_session.get('access_token') if user_session else None
-    response = client.post('/chat/', token=token, json={'message': message})
+    response = client.post('/v1/chat/', token=token, json={'message': message})
     if response and 'reply' in response:
         return response['reply']
     return "No response from server."
