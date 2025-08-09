@@ -17,7 +17,7 @@ from frontend.layouts.admin_layout import users_report, predictions_report, cred
 from frontend.layouts.billing_layout import billing_layout
 from frontend.layouts.billing_layout import transaction_history_table
 from frontend.layouts.prediction_layout import prediction_layout, \
-    snp_dandelion_plot, create_risk_results, create_variants_section
+    snp_dandelion_plot, create_risk_results, create_variants_section, card_style
 from frontend.layouts.sign_in_layout import sign_in_layout
 from frontend.layouts.sign_up_layout import sign_up_layout
 from frontend.ui_kit.components.error_message import error_message
@@ -95,7 +95,13 @@ def register_callbacks(_app):
         [State('user-session', 'data')]
     )
     def manage_page_content(pathname, user_session):
-        if user_session and user_session.get('is_authenticated'):
+        if pathname == '/home' or pathname == '/':
+            return "Home page layout will be implemented"
+        
+        elif pathname == '/info':
+            return "Info page layout will be implemented"
+        
+        elif user_session and user_session.get('is_authenticated'):
             if pathname == '/prediction':
                 return prediction_layout(user_session)
             elif pathname == '/billing':
@@ -107,22 +113,22 @@ def register_callbacks(_app):
                     return "403 Access Denied"
             else:
                 return "404 Page Not Found"
+        
+        # Non-authenticated user pages
         else:
             if pathname == '/sign-in':
                 return sign_in_layout()
             elif pathname == '/sign-up':
                 return sign_up_layout()
             else:
-                return dcc.Location(id='url', href='/sign-in', refresh=True)
+                return dcc.Location(id='url', href='/home', refresh=True)
 
     @_app.callback(
         Output('nav-bar', 'children'),
         [Input('user-session', 'data')]
     )
     def manage_navigation_bar(user_session):
-        if user_session and user_session.get('is_authenticated'):
-            return navigation_bar(user_session)
-        return ""
+        return navigation_bar(user_session)
 
     @_app.callback(
         [
@@ -296,7 +302,11 @@ def register_callbacks(_app):
     @_app.callback(
         [Output('risk-results', 'children'),
          Output('variants-section', 'children'),
-         Output('current-balance-predictions', 'children', allow_duplicate=True)],
+         Output('current-balance-predictions', 'children', allow_duplicate=True),
+         Output('results-section', 'style'),
+         Output('variants-section', 'style'),
+         Output('snp_dandelion-section', 'style'),
+         Output('pdf_report-section', 'style')],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
          State('upload-genetic-data', 'filename'),
@@ -316,7 +326,8 @@ def register_callbacks(_app):
                 error_msg = f"File validation failed: {'; '.join(validation_errors)}"
                 risk_results = create_risk_results(error_message=error_msg)
                 balance = fetch_user_balance(user_session=user_session)
-                return risk_results, create_variants_section(), user_balance(balance)
+                visible_style = {**card_style, 'display': 'block'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
             
             vcf_dir = 'input/vcf'
             os.makedirs(vcf_dir, exist_ok=True)
@@ -330,7 +341,8 @@ def register_callbacks(_app):
             if error:
                 risk_results = create_risk_results(error_message=error)
                 balance = fetch_user_balance(user_session=user_session)
-                return risk_results, create_variants_section(), user_balance(balance)
+                visible_style = {**card_style, 'display': 'block'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
@@ -339,17 +351,20 @@ def register_callbacks(_app):
                 error_msg = plink_result.get('error', 'Unknown error')
                 risk_results = create_risk_results(error_message=error_msg)
                 balance = fetch_user_balance(user_session=user_session)
-                return risk_results, create_variants_section(), user_balance(balance)
+                visible_style = {**card_style, 'display': 'block'}
+                return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
             risk_results = create_risk_results(error_message=error_msg)
             balance = fetch_user_balance(user_session=user_session)
-            return risk_results, create_variants_section(), user_balance(balance)
+            visible_style = {**card_style, 'display': 'block'}
+            return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
         
         balance = fetch_user_balance(user_session=user_session)
+        visible_style = {**card_style, 'display': 'block'}
         
-        return risk_results, create_variants_section(), user_balance(balance)
+        return risk_results, create_variants_section(), user_balance(balance), visible_style, visible_style, visible_style, visible_style
 
     @_app.callback(
         Output('prediction-history-table', 'children', allow_duplicate=True),

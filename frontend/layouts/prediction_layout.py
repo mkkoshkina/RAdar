@@ -378,9 +378,24 @@ def create_variants_table(plink_data=None, error_message=None):
         ]
     )
 
+def format_links(link_str):
+    if pd.isna(link_str) or link_str.strip() == '':
+        return ''
+    links = link_str.split(';')
+    formatted_links = []
+    for i, url in enumerate(links):
+        if not url.startswith('http'):
+            url = 'https://' + url
+        formatted_links.append(f"[{i+1}]({url})")
+    return ' '.join(formatted_links)
+
 def create_variants_section():
     csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
     df = pd.read_csv(csv_path)
+
+    if 'Sources' in df.columns:
+        df['Sources'] = df['Sources'].apply(format_links)
+
     fig = px.scatter(
         df,
         x='Position',
@@ -418,7 +433,7 @@ def create_variants_section():
                 dash_table.DataTable(
                     id='hover-info-table',
                     columns=[
-                        {'name': col, 'id': col, 'presentation': 'markdown'} if col == 'LINK'
+                        {'name': col, 'id': col, 'presentation': 'markdown'} if col == 'Sources'
                         else {'name': col, 'id': col}
                         for col in df.columns if df[col].notna().any()
                     ],
@@ -504,25 +519,35 @@ def prediction_layout(user_session):
         html.Div([
             html.H3("Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
-        ], style=card_style, id='results-section'),
+        ], style={**card_style, 'display': 'none'}, id='results-section'),
         
         html.Div([
             html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(create_variants_section())  
-        ], style=card_style, id='variants-section'),
+        ], style={**card_style, 'display': 'none'}, id='variants-section'),
 
         html.Div([
             html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
-        ], style=card_style, id='snp_dandelion-section'),
+        ], style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
+
+        html.Div([
+            html.H3("Intersection with drug annotations table", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Button('', id='', 
+            style=primary_button_style, disabled=True),
+        ], style={**card_style, 'display': 'none'}, id='pdf_report-section'),
+
+
+
 
         html.Div([
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
             html.Button('Download PDF Report', id='download-pdf-button', 
             style=primary_button_style, disabled=True),
-        ], style=card_style, id='pdf_report-section')
+        ], style={**card_style, 'display': 'none'}, id='pdf_report-section')
 
-
+        
+        
         # html.Div([
         #     html.H3("Analysis History", style={'color': '#333', 'marginBottom': '15px'}),
         #     html.Button('Clear History', id='clear-history-button', 
