@@ -17,7 +17,6 @@ A Polygenic Risk Score combines information from multiple genetic variants to es
 - Basic familiarity with command line tools
 
 ## 📋 How to Use
-# RAdar Documentation
 
 This repository contains two main components:
 1. **A service platform**
