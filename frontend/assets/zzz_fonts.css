@@ -1,18 +1,51 @@
 /* Load Montserrat (or swap for your pick) */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 
 /* Max coverage: html/body/root/app containers + everything inside */
 html, body, #react-entry-point, #_dash-app-content, #_dash-app-content * {
   font-family: 'Montserrat', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
 }
 
-/* DataTable: cells, headers, tooltips */
+/* Global body styling */
+body {
+  background-color: var(--background-warm);
+  color: var(--text-dark);  /* Now using the dark text */
+  line-height: 1.6;
+}
+
+/* Modern card styling */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-elevated);
+  transform: translateY(-2px);
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+  background: linear-gradient(90deg, var(--primary-blue-dark), var(--primary-blue));
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+/* DataTable styling */
+
 .dash-table-container, .dash-table-container *,
 .dash-tooltip, .dash-tooltip * {
   font-family: 'Montserrat', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
 }
 
-/* Plotly SVG text (ticks, legends, titles) */
+
+/* Plotly SVG text */
 .js-plotly-plot .plotly text {
   font-family: 'Montserrat', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
 }
+

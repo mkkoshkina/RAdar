@@ -12,30 +12,9 @@ from pathlib import Path
 from frontend.data.remote_data import fetch_user_balance, fetch_prediction_history
 from frontend.ui_kit.components.user_balance import user_balance
 from frontend.ui_kit.styles import table_style, table_header_style, table_cell_style, input_style, \
-    dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style
+    dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style, \
+    card_style, upload_style
 from frontend.ui_kit.utils import format_timestamp
-
-card_style = {
-    'backgroundColor': '#ffffff',
-    'padding': '20px',
-    'margin': '10px 0',
-    'borderRadius': '8px',
-    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
-    'border': '1px solid #e0e0e0'
-}
-
-upload_style = {
-    'width': '100%',
-    'height': '60px',
-    'lineHeight': '60px',
-    'borderWidth': '2px',
-    'borderStyle': 'dashed',
-    'borderRadius': '8px',
-    'textAlign': 'center',
-    'margin': '10px 0',
-    'borderColor': '#007bff',
-    'backgroundColor': '#f8f9fa'
-}
 
 risk_colors = {
     'low': '#28a745',
@@ -127,10 +106,10 @@ def genetic_upload_form():
         
         html.Div(id='upload-status', style={'margin': '10px 0'}),
         
-        html.Button('Analyze Rheumatoid Arthritis Risk', id='analyze-button', 
+        html.Button('Analyze Rheumatoid Arthritis Risk', id='analyze-button', className='btn-primary', 
                    style=primary_button_style, disabled=True),
         
-    ], style=card_style)
+    ], className='card', style=card_style)
 
 
 def create_error_display(error_message):
@@ -229,14 +208,14 @@ def create_error_display(error_message):
         
         html.Div([
             html.Button('Try Again', 
-                       id='error-try-again-button',
+                       id='error-try-again-button', className='btn-primary',
                        style={
                            **primary_button_style,
                            'marginTop': '15px'
                        })
         ])
         
-    ], style={
+    ], className='card', style={
         **card_style,
         'border': '2px solid #dc3545',
         'backgroundColor': '#fff5f5'
@@ -319,11 +298,13 @@ def create_risk_results(plink_data=None, error_message=None):
             html.Ul([
                 html.Li("Consult with a rheumatologist for further evaluation"),
                 html.Li("Consider regular joint health monitoring"),
-                html.Li("Maintain healthy weight and regular exercise")
+                html.Li("Maintain healthy weight and regular exercise"),
+                html.Li("Avoid smoking")
             ] if risk_label in ['higher than average', 'high'] else [
                 html.Li("Maintain current healthy lifestyle"),
                 html.Li("Regular exercise to maintain joint flexibility"),
-                html.Li("Balanced diet rich in omega-3 fatty acids")
+                html.Li("Balanced diet rich in omega-3 fatty acids"),
+                html.Li("Avoid smoking")
             ])
         ])
     ])
@@ -344,7 +325,7 @@ def create_variants_table(plink_data=None, error_message=None):
                 html.P(f"Total SNPs found in your data: {snps_total:,}"),
                 html.P(f"SNPs used in risk calculation: {snps_used:,}"),
                 html.P(f"Coverage: {(snps_used/snps_total*100):.1f}%" if snps_total > 0 else "Coverage: N/A"),
-                html.P("Risk score calculated using PGS002769 (Rheumatoid Arthritis)")
+                html.P("Risk score calculated using PGS000195 (Rheumatoid Arthritis)")
             ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '5px'})
         ])
     
@@ -389,25 +370,35 @@ def format_links(link_str):
         formatted_links.append(f"[{i+1}]({url})")
     return ' '.join(formatted_links)
 
-def create_variants_section():
+def create_variants_section(sample):
     csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
+    tsv_path = f'output/{sample}_final_prs_table.tsv'
+
     df = pd.read_csv(csv_path)
+    df_snps = pd.read_csv(tsv_path, sep='\t')
+
+    df['is_in_sample'] = df['rsID'].isin(df_snps['rsid'])
+    df['color'] = df['is_in_sample'].map({True: 'red', False: 'blue'})
 
     if 'Sources' in df.columns:
         df['Sources'] = df['Sources'].apply(format_links)
 
-    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
+    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description','color','is_in_sample']]
+
+    df_display = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
 
     fig = px.scatter(
         df,
         x='Position',
         y='Effect weight',
-        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True},
+        color='color',
+        color_discrete_map={'red': 'red', 'blue': 'blue'},
+        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True, 'color': False, 'is_in_sample': False},
     )
 
     fig.update_traces(
         customdata=df.to_dict('records'),
-        marker=dict(size=5, opacity=0.8, color='blue')
+        marker=dict(size=5, opacity=0.8)
     )
 
     fig.update_layout(
@@ -437,7 +428,7 @@ def create_variants_section():
                     columns=[
                         {'name': col, 'id': col, 'presentation': 'markdown'} if col == 'Sources'
                         else {'name': col, 'id': col}
-                        for col in df.columns if df[col].notna().any()
+                        for col in df_display.columns if df_display[col].notna().any()
                     ],
                     data=[],
                     style_table={'maxHeight': '350px', 'overflowY': 'auto', 'fontSize': '16px'},
@@ -450,68 +441,290 @@ def create_variants_section():
             'position': 'relative',
             'width': '800px',
             'height': '650px'
-        })
+        }),
+
+        html.Div([
+                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.Ul([
+                    html.Li("This section shows the genetic variants associated with rheumatoid arthritis, each point represents a mutation"),
+                    html.Li("The x-axis shows the genomic position of the variant, y-axis shows the effect size of the variant on rheumatoid arthritis risk"),
+                    html.Li(["Red points indicate variants present in", html.B(" your genetic data")]),
+                    html.Li("If you hover over a point, you will see more information about the variant"),
+                    html.Li("The table below the plot shows detailed information about the variants, such as the gene name and symbol, chromosome, position and etc."),
+                    html.Li([html.B("You can click on the links in the Sources column to learn more about each variant")])
+                ], style={'color': '#666', 'fontSize': '14px'})
+            ], style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '15px',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+                'border': '1px solid #e9ecef'
+            })
     ])
 
-
-# def prediction_history_table(predictions):
-#     if not predictions:
-#         return html.Div("No analysis history available", style=text_style)
-
-#     batches = {}
-#     for prediction in predictions:
-#         batch_key = (prediction["model_name"], prediction["timestamp"], prediction["cost"], prediction["id"])
-#         if batch_key not in batches:
-#             batches[batch_key] = []
-#         batches[batch_key].extend(prediction.get('predictions', []))
-
-#     batch_tables = []
-#     for (model_name, timestamp, cost, _), preds in batches.items():
-#         data = [
-#             {
-#                 "merchant_id": pred["features"]["merchant_id"],
-#                 "cluster_id": pred["features"]["cluster_id"],
-#                 "predicted_category_id": pred["target"]["category_id"],
-#                 "predicted_category_label": pred["target"]["category_label"],
-#             }
-#             for pred in preds
-#         ]
-
-#         columns = [
-#             {"name": "Merchant ID", "id": "merchant_id"},
-#             {"name": "Cluster ID", "id": "cluster_id"},
-#             {"name": "Predicted Category ID", "id": "predicted_category_id"},
-#             {"name": "Predicted Category Label", "id": "predicted_category_label"},
-#         ]
-
-#         batch_info = html.Div([
-#             html.H5(f"{model_name}, {format_timestamp(timestamp)}, Cost: {abs(cost)}", style=heading5_style),
-#             dash_table.DataTable(
-#                 columns=columns,
-#                 data=data,
-#                 style_table=table_style,
-#                 style_cell=table_cell_style,
-#                 style_header=table_header_style
-#             )
-#         ])
-
-#         batch_tables.append(batch_info)
-
-#     return html.Div(batch_tables)
 
 def snp_dandelion_plot():
     return html.Div('Here be the SNP Dandelion Plot')
 
-def top_10_snps():
-    return html.Div('Here be the top_10_snps')
+def create_top_10_snps_section(sample):
+    
+    tsv_path = f'output/{sample}_final_prs_table.tsv'
+    
+    try:
+        if not tsv_path:
+            return html.Div([
+                html.P(f"Top 10 SNPs file not found for sample: {sample}", 
+                       style={'color': '#dc3545', 'fontStyle': 'italic'})
+            ])
 
+        df = pd.read_csv(tsv_path, sep='\t')
+        
+        df_sorted = df.sort_values('effect_size', ascending=False).head(10)
+        df_sorted = df_sorted.copy()
+        df_sorted['effect_size'] = df_sorted['effect_size'].round(4)
+        display_columns = {
+            'rsid': 'SNP ID',
+            'ref': 'Reference Allele',
+            'effect_allele': 'Effect Allele', 
+            'effect_size': 'Effect Size',
+            'ALT_FREQS': 'Allele Frequency',
+            'genotype': 'Your Genotype'
+        }
+        
+        df_display = df_sorted.rename(columns=display_columns)
+    
+        return html.Div([
+            html.P(f"Showing top 10 SNPs with highest effect sizes from your genetic analysis", 
+                   style={'marginBottom': '15px', 'color': '#666'}),
+            
+            dash_table.DataTable(
+                columns=[
+                    {'name': col, 'id': col, 'type': 'numeric', 'format': {'specifier': '.4f'}} 
+                    if col == 'Effect Size' else {'name': col, 'id': col}
+                    for col in df_display.columns
+                ],
+                data=df_display.to_dict('records'),
+                style_table={
+                    'maxHeight': '400px', 
+                    'overflowY': 'auto', 
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd'
+                },
+                style_cell={
+                    'textAlign': 'left', 
+                    'padding': '10px', 
+                    'fontFamily': 'Arial', 
+                    'fontSize': '13px',
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'minWidth': '100px'
+                },
+                style_header={
+                    'fontWeight': 'bold', 
+                    'backgroundColor': '#f8f9fa', 
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd',
+                    'textAlign': 'center'
+                },
+                style_data={
+                    'border': '1px solid #ddd'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': '#f9f9f9'
+                    },
+                    {
+                        'if': {'column_id': 'Effect Size'},
+                        'textAlign': 'right',
+                        'fontWeight': 'bold',
+                        'color': '#0066cc'
+                    }
+                ],
+                sort_action="native"
+            ),
+            
+            html.Div([
+                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.Ul([
+                    html.Li("Higher effect sizes indicate stronger contribution to rheumatoid arthritis risk"),
+                    html.Li("Your genotype shows how many copies of the effect allele you carry (0, 1, or 2)"),
+                    html.Li("Allele frequency represents how common this variant is in the population"),
+                    html.Li("These SNPs are part of the polygenic risk score calculation")
+                ], style={'color': '#666', 'fontSize': '14px'})
+            ], style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '15px',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+                'border': '1px solid #e9ecef'
+            })
+        ])
+        
+    except Exception as e:
+        return html.Div([
+            html.P(f"Error loading top 10 SNPs: {str(e)}", 
+                   style={'color': '#dc3545', 'fontStyle': 'italic'})
+        ])
+
+# def create_variants_table(plink_data=None, error_message=None):
+
+#     if error_message:
+#         return html.Div()
+    
+#     if plink_data:
+#         snps_total = plink_data.get('number_of_alleles_observed', 0)
+#         snps_used = plink_data.get('number_of_alleles_detected', 0)
+        
+#         return html.Div([
+#             html.H5("Polygenic Risk Score Analysis Summary", style={'margin': '15px 0 10px 0'}),
+#             html.Div([
+#                 html.P(f"Total SNPs found in your data: {snps_total:,}"),
+#                 html.P(f"SNPs used in risk calculation: {snps_used:,}"),
+#                 html.P(f"Coverage: {(snps_used/snps_total*100):.1f}%" if snps_total > 0 else "Coverage: N/A"),
+#                 html.P("Risk score calculated using PGS002769 (Rheumatoid Arthritis)")
+#             ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '5px'})
+#         ])
+    
+#     variants_data = [
+#         {"Gene": "HLA-DRB1", "Variant": "rs2395029", "Risk Allele": "G", 
+#          "Your Genotype": random.choice(["GG", "GT", "TT"]), 
+#          "Effect": "Increased RA risk"},
+#         {"Gene": "PTPN22", "Variant": "rs2476601", "Risk Allele": "T", 
+#          "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+#          "Effect": "Autoimmune susceptibility"},
+#         {"Gene": "IL1RN", "Variant": "rs419598", "Risk Allele": "T", 
+#          "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+#          "Effect": "Inflammatory response"},
+#         {"Gene": "COL1A1", "Variant": "rs1800012", "Risk Allele": "T", 
+#          "Your Genotype": random.choice(["TT", "TC", "CC"]), 
+#          "Effect": "Cartilage structure"}
+#     ]
+    
+#     return dash_table.DataTable(
+#         columns=[{"name": col, "id": col} for col in variants_data[0].keys()],
+#         data=variants_data,
+#         style_table=table_style,
+#         style_cell=table_cell_style,
+#         style_header=table_header_style,
+#         style_data_conditional=[
+#             {
+#                 'if': {'filter_query': '{Risk Allele} = {Your Genotype}'},
+#                 'backgroundColor': '#ffe6e6',
+#                 'color': 'black',
+#             }
+#         ]
+#     )
+
+def create_drug_annotation_section(sample):
+    csv_path = f'output/{sample}_intersection_with_drug_annotation.csv'
+    
+    try:
+        if not Path(csv_path).exists():
+            return html.Div([
+                html.P(f"Drug annotation file not found: {csv_path}", 
+                       style={'color': '#dc3545', 'fontStyle': 'italic'})
+            ])
+        
+        df = pd.read_csv(csv_path)
+
+        required_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        df.rename(columns={"CHROM": "Chromosome", "POS": "Position", "ID_x": "SNP ID", "REF": "Reference Allele", "ALT": "Alternate Allele"}, inplace=True)
+        available_columns = [col for col in required_columns if col in df.columns]
+        
+        if not available_columns:
+            return html.Div([
+                html.P("Required columns not found in the drug annotation file.", 
+                       style={'color': '#dc3545', 'fontStyle': 'italic'})
+            ])
+        
+        df_filtered = df[available_columns].copy()
+        
+        df_filtered = df_filtered.dropna(how='all')
+        df_filtered = df_filtered[df_filtered['sample'].str.contains('1/0|0/1|1/1', na=False)]
+
+        if df_filtered.empty:
+            return html.Div([
+                html.P("No drug annotation data available for display.", 
+                       style={'color': '#666', 'fontStyle': 'italic'})
+            ])
+        
+        return html.Div([
+            html.P(f"Showing {len(df_filtered)} drug-gene interactions from your genetic data", 
+                   style={'marginBottom': '15px', 'color': '#666'}),
+            
+            dash_table.DataTable(
+                columns=[
+                    {'name': col, 'id': col} for col in df_filtered.columns
+                ],
+                data=df_filtered.to_dict('records'),
+                style_table={
+                    'maxHeight': '400px', 
+                    'overflowY': 'auto',
+                    'overflowX': 'auto',
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd'
+                },
+                style_cell={
+                    'textAlign': 'left', 
+                    'padding': '8px', 
+                    'fontFamily': 'Arial', 
+                    'fontSize': '13px',
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'minWidth': '100px',
+                    'maxWidth': '200px',
+                },
+                style_header={
+                    'fontWeight': 'bold', 
+                    'backgroundColor': '#f8f9fa', 
+                    'fontSize': '14px',
+                    'border': '1px solid #ddd'
+                },
+                style_data={
+                    'border': '1px solid #ddd'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': '#f9f9f9'
+                    }
+                ],
+                page_size=20,  
+                sort_action="native", 
+                filter_action="native" 
+            ),
+            
+            html.Div([
+                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.Ul([
+                    html.Li("This section shows genetic variants found in your data associated with drug efficacy and toxicity"),
+                    html.Li("The column sample shows your genotype for each variant. 1/1 - both alleles are present, 1/0 or 0/1 - one allele is present"),
+                    html.Li("The column Drugs shows the drugs that may be affected by these variants"),
+                    html.Li("The column Phenotype Categories shows the type of effect the variant has on drug response"),
+                    html.Li("You can fillter and sort the table to find specific variants or drugs")
+                ], style={'color': '#666', 'fontSize': '14px'})
+            ], style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '15px',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+                'border': '1px solid #e9ecef'
+            })
+        ])
+        
+    except Exception as e:
+        return html.Div([
+            html.P(f"Error loading drug annotation data: {str(e)}", 
+                   style={'color': '#dc3545', 'fontStyle': 'italic'})
+        ])
 
 def prediction_layout(user_session):
     balance = fetch_user_balance(user_session)
     predictions = fetch_prediction_history(user_session)
     
     return html.Div([
-        html.H1("Genetic Arthritis Risk Prediction", 
+        html.H1("Rheumatoid Arthritis Polygenic Risk Score Prediction", 
                 style={'textAlign': 'center', 'color': '#333', 'marginBottom': '30px'}),
         
         html.Div(user_balance(balance), id='current-balance-predictions'),
@@ -519,34 +732,35 @@ def prediction_layout(user_session):
         genetic_upload_form(),
         
         html.Div([
-            html.H3("Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3("Your Polygenic Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
-        ], style={**card_style, 'display': 'none'}, id='results-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='results-section'),
         
         html.Div([
             html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Div(create_variants_section())  
-        ], style={**card_style, 'display': 'none'}, id='variants-section'),
+            html.Div(id='variants-section-content')  
+        ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
         html.Div([
             html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
-        ], style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
+        ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
         html.Div([
-            html.H3("Intersection with drug annotations table", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('', id='', 
-            style=primary_button_style, disabled=True),
-        ], style={**card_style, 'display': 'none'}, id='pdf_report-section'),
+            html.H3("Mutations Responsible For Drug Efficacy and Toxicity", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Div(id='drug-annotation-content')
+        ], className='card', style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
 
-
-
+        html.Div([
+            html.H3("Top 10 Most Influential SNPs", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Div(id='top-10-snps-content')
+        ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
 
         html.Div([
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('Download PDF Report', id='download-pdf-button', 
+            html.Button('Download PDF Report', id='download-pdf-button', className='btn-primary', 
             style=primary_button_style, disabled=True),
-        ], style={**card_style, 'display': 'none'}, id='pdf_report-section')
+        ], className='card', style={**card_style, 'display': 'none'}, id='pdf_report-section')
 
         
         
