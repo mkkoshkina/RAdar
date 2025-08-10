@@ -610,7 +610,7 @@ def snp_dandelion_plot(sample):
                     )
             else:
                 snp_components.append(
-                    html.P(f"No annotations found for {rs_id}", style={
+                    html.P(f"There are no protein-coding genes located within a 200 kb radius of this SNP: {rs_id}", style={
                         'color': '#666',
                         'fontStyle': 'italic',
                         'textAlign': 'center',

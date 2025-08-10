@@ -4,6 +4,7 @@ from frontend.ui_kit.styles import (
     primary_button_style,
     secondary_button_style,
     text_style,
+    theme_colors,
 )
 
 
@@ -15,12 +16,13 @@ page_container_style = {
 }
 
 hero_style = {
-    "backgroundColor": "#ffffff",
-    "padding": "24px",
-    "borderRadius": "12px",
-    "boxShadow": "0 2px 4px rgba(0,0,0,0.06)",
-    "border": "1px solid #eaeaea",
-    "textAlign": "center",
+    'background': f'linear-gradient(135deg, {theme_colors["primary"]} 0%, {theme_colors["primary_dark"]} 100%)',
+    'color': 'white',
+    'padding': '50px 30px',
+    'borderRadius': '12px',
+    'textAlign': 'center',
+    'boxShadow': '0 8px 32px rgba(37, 99, 235, 0.2)',
+    'marginBottom': '24px'
 }
 
 cards_wrap_style = {
@@ -97,25 +99,69 @@ The PRS is an adjunctive tool, not a diagnostic test. It should be interpreted i
 
 def hero_section(app_name: str):
     return html.Div([
-        html.H1("Welcome", style={"margin": 0, "fontSize": "28px", "fontWeight": 700}),
+        html.H1("Welcome to SNP2Risk-RA", style={
+            'margin': '0 0 15px 0', 
+            'fontSize': '2.8rem', 
+            'fontWeight': '700',
+            'textShadow': '0 2px 4px rgba(0,0,0,0.1)'
+        }),
         html.P(
-            "Upload a VCF file to calculate polygenic risk for rheumatoid arthritis.",
-            style={**text_style, "margin": "6px 0 16px 0"},
+            "Upload a VCF file to calculate polygenic risk for rheumatoid arthritis using validated genomic data.",
+            style={
+                'fontSize': '1.2rem',
+                'margin': '0 0 30px 0',
+                'opacity': '0.95',
+                'maxWidth': '600px',
+                'marginLeft': 'auto',
+                'marginRight': 'auto',
+                'lineHeight': '1.5'
+            },
         ),
         html.Div(
             [
                 dcc.Link(
-
-                    html.Button("Upload VCF & Analyze", id="home-upload-cta", n_clicks=0,
-                                className='btn-primary', style=primary_button_style),
+                    html.Button([
+                        html.I(className="fas fa-upload", style={'marginRight': '10px'}),
+                        "Upload VCF & Analyze"
+                    ], id="home-upload-cta", n_clicks=0,
+                       className='btn-primary', style={
+                        **primary_button_style,
+                        'backgroundColor': 'white',
+                        'color': theme_colors['primary'],
+                        'fontWeight': '600',
+                        'padding': '14px 28px',
+                        'fontSize': '1.1rem',
+                        'border': 'none',
+                        'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        'marginRight': '15px',
+                        'transition': 'all 0.3s ease'
+                    }),
                     href="/analyze",
                 ),
                 dcc.Link(
-                    html.Button("View Information", id="home-docs-cta", n_clicks=0, className='btn-primary', style=secondary_button_style),
+                    html.Button([
+                        html.I(className="fas fa-info-circle", style={'marginRight': '10px'}),
+                        "View Information"
+                    ], id="home-docs-cta", n_clicks=0, 
+                       className='btn-primary', style={
+                        **secondary_button_style,
+                        'backgroundColor': 'rgba(255, 255, 255, 0.2)',
+                        'color': 'white',
+                        'border': '2px solid white',
+                        'fontWeight': '500',
+                        'padding': '14px 28px',
+                        'fontSize': '1.1rem',
+                        'transition': 'all 0.3s ease'
+                    }),
                     href="/info",
                 ),
             ],
-            style=btn_row_style,
+            style={
+                'display': 'flex',
+                'justifyContent': 'center',
+                'flexWrap': 'wrap',
+                'gap': '15px'
+            },
         ),
     ], style=hero_style)
 
