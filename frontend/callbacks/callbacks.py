@@ -18,6 +18,7 @@ from frontend.layouts.admin_layout import users_report, predictions_report, cred
 from frontend.layouts.billing_layout import billing_layout
 from frontend.layouts.billing_layout import transaction_history_table
 from frontend.layouts.home_layout import home_layout
+from frontend.layouts.info_layout import info_layout
 from frontend.layouts.prediction_layout import prediction_layout, \
     snp_dandelion_plot, create_risk_results, create_variants_section, card_style, create_drug_annotation_section, create_top_10_snps_section
 from frontend.layouts.sign_in_layout import sign_in_layout
@@ -108,7 +109,7 @@ def register_callbacks(_app):
             return home_layout(user_session)
         
         elif pathname == '/info':
-            return "Info page layout will be implemented"
+            return info_layout(user_session)
         
         elif pathname == '/analyze':
             # For now, redirect to prediction page or create analyze layout

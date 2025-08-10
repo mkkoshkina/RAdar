@@ -567,14 +567,21 @@ def snp_dandelion_plot(sample):
         return html.Div([
             html.H3("Top 3 SNPs by Effect Size", style={
                 'textAlign': 'center', 
-                'margin': '20px 0 30px 0', 
+                'margin': '20px 0 10px 0', 
                 'color': '#333'
+            }),
+            html.P("The regions are centered around SNPs and encompass 200 kb", style={
+                'textAlign': 'center',
+                'margin': '0 0 0px 0',
+                'color': '#0066cc',
+                'fontSize': '14px',
+                'fontStyle': 'italic'
             }),
             html.Div(image_components, style={
                 'display': 'flex', 
                 'flexDirection': 'column',
                 'alignItems': 'center',
-                'gap': '30px'
+                'gap': '0px'
             })
         ])
         
@@ -879,7 +886,7 @@ def prediction_layout(user_session):
         ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
 
          html.Div([
-            html.H3("Top 3 SNPs Visualization", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3("Visualizations of genomic regions containing SNPs", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
         ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 

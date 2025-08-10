@@ -110,8 +110,7 @@ def hero_section(app_name: str):
                 ),
                 dcc.Link(
                     html.Button("View Information", id="home-docs-cta", n_clicks=0, className='btn-primary', style=secondary_button_style),
-
-                    href="/docs",
+                    href="/info",
                 ),
             ],
             style=btn_row_style,
