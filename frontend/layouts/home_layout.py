@@ -91,7 +91,7 @@ The PRS is an adjunctive tool, not a diagnostic test. It should be interpreted i
 - VCF — MyHeritage, Ancestry, Atlas, WES/WGS
 
 ### 🔹 Clinical use case
-**SNP2Risk-RA** can be incorporated into preventive rheumatology workflows as part of risk-based patient management, supporting earlier detection, improved counseling, and proactive care pathways.
+**RAdar** can be incorporated into preventive rheumatology workflows as part of risk-based patient management, supporting earlier detection, improved counseling, and proactive care pathways.
 """
 
 
@@ -180,7 +180,7 @@ def info_cards(app_name: str):
                 html.Div("3. PRS aggregation with validated weights", style=text_style),
                 html.Div("4. Report preview & export", style=text_style),
             ], style={"display": "flex", "flexDirection": "column", "gap": "8px"}),
-            html.Div("Supported: hg19 / hg38 (auto-detect when possible)", style={**text_style, "marginTop": "8px", "opacity": 0.9}),
+            html.Div("Supported: GRCh37", style={**text_style, "marginTop": "8px", "opacity": 0.9}),
         ], style=card_style),
         html.Div([
             html.Div("Quick start", style=heading_style),
@@ -196,7 +196,7 @@ def info_cards(app_name: str):
 
 # ------- Layout -------
 
-def home_layout(user_session=None, app_name: str = "SNP2Risk-RA"):
+def home_layout(user_session=None, app_name: str = "RAdar"):
     return html.Div([
         hero_section(app_name),
         info_cards(app_name),
