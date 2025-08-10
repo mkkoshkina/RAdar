@@ -298,11 +298,13 @@ def create_risk_results(plink_data=None, error_message=None):
             html.Ul([
                 html.Li("Consult with a rheumatologist for further evaluation"),
                 html.Li("Consider regular joint health monitoring"),
-                html.Li("Maintain healthy weight and regular exercise")
+                html.Li("Maintain healthy weight and regular exercise"),
+                html.Li("Avoid smoking")
             ] if risk_label in ['higher than average', 'high'] else [
                 html.Li("Maintain current healthy lifestyle"),
                 html.Li("Regular exercise to maintain joint flexibility"),
-                html.Li("Balanced diet rich in omega-3 fatty acids")
+                html.Li("Balanced diet rich in omega-3 fatty acids"),
+                html.Li("Avoid smoking")
             ])
         ])
     ])
@@ -446,7 +448,7 @@ def create_variants_section(sample):
                 html.Ul([
                     html.Li("This section shows the genetic variants associated with rheumatoid arthritis, each point represents a mutation"),
                     html.Li("The x-axis shows the genomic position of the variant, y-axis shows the effect size of the variant on rheumatoid arthritis risk"),
-                    html.Li(["Red points indicate variants present in", html.B("your genetic data")]),
+                    html.Li(["Red points indicate variants present in", html.B(" your genetic data")]),
                     html.Li("If you hover over a point, you will see more information about the variant"),
                     html.Li("The table below the plot shows detailed information about the variants, such as the gene name and symbol, chromosome, position and etc."),
                     html.Li([html.B("You can click on the links in the Sources column to learn more about each variant")])
@@ -691,7 +693,24 @@ def create_drug_annotation_section(sample):
                 page_size=20,  
                 sort_action="native", 
                 filter_action="native" 
-            )
+            ),
+            
+            html.Div([
+                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.Ul([
+                    html.Li("This section shows genetic variants found in your data associated with drug efficacy and toxicity"),
+                    html.Li("The column sample shows your genotype for each variant. 1/1 - both alleles are present, 1/0 or 0/1 - one allele is present"),
+                    html.Li("The column Drugs shows the drugs that may be affected by these variants"),
+                    html.Li("The column Phenotype Categories shows the type of effect the variant has on drug response"),
+                    html.Li("You can fillter and sort the table to find specific variants or drugs")
+                ], style={'color': '#666', 'fontSize': '14px'})
+            ], style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '15px',
+                'borderRadius': '5px',
+                'marginTop': '20px',
+                'border': '1px solid #e9ecef'
+            })
         ])
         
     except Exception as e:
