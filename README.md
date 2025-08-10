@@ -27,7 +27,7 @@ This repository contains:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Your genetic raw data file in VCF format
+- Your genetic raw data file in VCF format (example VCF file provided in input/ folder
 - Docker installed on your system
 - Basic familiarity with command line tools
 
