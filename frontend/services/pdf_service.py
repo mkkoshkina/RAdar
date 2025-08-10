@@ -79,11 +79,10 @@ class PDFReportGenerator:
                 story.append(Paragraph(f"<b>Your risk is {risk_label}. It is higher than {int(risk_percentile)}% of people.</b>", self.styles['Normal']))
                 story.append(Spacer(1, 12))
                 
-                # Summary table
                 summary_data = [
                     ['Risk Score', f'{risk:.4f}'],
-                    ['Total SNPs in your data', f'{snps_total:,}'],
-                    ['SNPs used in calculation', f'{snps_used:,}'],
+                    ['Total alleles observed', f'{snps_total:,}'],
+                    ['Number of risk alleles detected', f'{snps_used:,}'],
                     ['Coverage', f'{(snps_used/snps_total*100):.1f}%' if snps_total > 0 else 'N/A']
                 ]
                 summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
