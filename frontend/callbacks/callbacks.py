@@ -280,18 +280,36 @@ def register_callbacks(_app):
 
     #     raise PreventUpdate
 
+    # Immediate loading state when file is selected
+    @_app.callback(
+        [Output('upload-icon', 'className', allow_duplicate=True),
+         Output('upload-text', 'children', allow_duplicate=True),
+         Output('upload-text', 'style', allow_duplicate=True)],
+        Input('upload-genetic-data', 'contents'),
+        prevent_initial_call=True
+    )
+    def show_immediate_loading(contents):
+        if contents is not None:
+            return ("fas fa-spinner fa-spin", 
+                   "Processing file, please wait...", 
+                   {'color': '#2563eb', 'fontWeight': '600'})
+        raise PreventUpdate
 
     @_app.callback(
         [Output('upload-status', 'children'),
-         Output('analyze-button', 'disabled')],
+         Output('analyze-button', 'disabled'),
+         Output('upload-icon', 'className'),
+         Output('upload-text', 'children'),
+         Output('upload-text', 'style')],
         Input('upload-genetic-data', 'contents'),
         State('upload-genetic-data', 'filename')
     )
     def update_upload_status(contents, filename):
         if contents is None:
-            return "", True
+            return "", True, "fas fa-upload", "Drag and Drop or Click to Select Genetic Data File", {}
         
         try:
+            # Show loading state immediately while processing
             content_type, content_string = contents.split(',')
             decoded = base64.b64decode(content_string)
             
@@ -299,26 +317,31 @@ def register_callbacks(_app):
             
             if validation_errors:
                 error_list = "\\n".join([f"• {error}" for error in validation_errors])
-                return dcc.Markdown(
+                return (dcc.Markdown(
                     f"❌ **File validation failed:**\\n{error_list}", 
                     style={'color': '#dc3545'}
-                ), True
+                ), True, "fas fa-exclamation-triangle", "Upload failed - please try again", 
+                {'color': '#dc2626', 'fontWeight': '600'})
             
             file_size_mb = len(decoded) / (1024 * 1024)
             if file_size_mb > 100:
-                return dcc.Markdown(
+                return (dcc.Markdown(
                     f"⚠️ **Large file uploaded:** {filename} ({file_size_mb:.1f} MB)\\n"
                     f"Analysis may take several minutes to complete.", 
                     style={'color': '#ffc107'}
-                ), False
+                ), False, "fas fa-check-circle", f"Ready to analyze {filename}",
+                {'color': '#059669', 'fontWeight': '600'})
             
-            return dcc.Markdown(f"✅ **File uploaded:** {filename}", style={'color': '#28a745'}), False
+            return (dcc.Markdown(f"✅ **File uploaded:** {filename}", style={'color': '#28a745'}), 
+                   False, "fas fa-check-circle", f"Ready to analyze {filename}",
+                   {'color': '#059669', 'fontWeight': '600'})
             
         except Exception as e:
-            return dcc.Markdown(
+            return (dcc.Markdown(
                 f"❌ **Error reading file:** {str(e)}", 
                 style={'color': '#dc3545'}
-            ), True
+            ), True, "fas fa-exclamation-triangle", "Upload failed - please try again",
+            {'color': '#dc2626', 'fontWeight': '600'})
 
     # Loading state callback for analyze button
     @_app.callback(
@@ -450,8 +473,8 @@ def register_callbacks(_app):
         if n_clicks:
             return (
                 html.Div([
-                    html.I(className="fas fa-upload", style={'marginRight': '10px'}),
-                    'Drag and Drop or Click to Select Genetic Data File'
+                    html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
+                    html.Span(id='upload-text', children='Drag and Drop or Click to Select Genetic Data File', style={})
                 ]),
                 "",
                 True

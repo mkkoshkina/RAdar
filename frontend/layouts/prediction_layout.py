@@ -106,8 +106,8 @@ def genetic_upload_form():
         dcc.Upload(
             id='upload-genetic-data',
             children=html.Div([
-                html.I(className="fas fa-upload", style={'marginRight': '10px'}),
-                'Drag and Drop or Click to Select Genetic Data File'
+                html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
+                html.Span(id='upload-text', children='Drag and Drop or Click to Select Genetic Data File', style={})
             ]),
             style=upload_style,
             multiple=False

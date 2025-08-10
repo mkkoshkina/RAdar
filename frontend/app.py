@@ -50,7 +50,9 @@ app.index_string = '''
         <title>{%title%}</title>
         {%favicon%}
         {%css%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
+            /* Chat button hover effects */
             #open-chat-popup:hover {
                 background: #0056b3 !important;
                 transform: scale(1.05) !important;
@@ -70,6 +72,61 @@ app.index_string = '''
             #send-button:active {
                 transform: translateY(0px) !important;
                 background: #004494 !important;
+            }
+            
+            /* Upload loading animation */
+            .fa-spin {
+                animation: fa-spin 1.5s infinite linear;
+                color: #2563eb;
+            }
+            
+            @keyframes fa-spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* Smooth transitions for upload states */
+            #upload-icon {
+                transition: all 0.3s ease;
+            }
+            
+            #upload-text {
+                transition: all 0.3s ease;
+            }
+            
+            /* Upload area hover effect */
+            div[id="upload-genetic-data"]:hover {
+                border-color: #2563eb !important;
+                background-color: #f0f7ff !important;
+                cursor: pointer;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+            }
+            
+            /* Success state styling */
+            .fa-check-circle {
+                color: #059669 !important;
+            }
+            
+            /* Error state styling */
+            .fa-exclamation-triangle {
+                color: #dc2626 !important;
+            }
+            
+            /* Upload text color changes based on state */
+            #upload-text.success {
+                color: #059669;
+                font-weight: 600;
+            }
+            
+            #upload-text.error {
+                color: #dc2626;
+                font-weight: 600;
+            }
+            
+            #upload-text.loading {
+                color: #2563eb;
+                font-weight: 600;
             }
         </style>
     </head>
