@@ -512,10 +512,12 @@ def register_callbacks(_app):
         return base_style
 
     # CONSOLIDATED CHAT CALLBACKS
+# Replace the existing chat popup toggle callback with this improved version:
+
     @_app.callback(
         Output('chat-popup-container', 'style'),
         [Input('open-chat-popup', 'n_clicks'),
-         Input('chat-popup-close', 'n_clicks')],
+        Input('chat-popup-close', 'n_clicks')],
         [State('chat-popup-container', 'style')],
         prevent_initial_call=True
     )
@@ -523,13 +525,35 @@ def register_callbacks(_app):
         ctx = callback_context
         if not ctx.triggered:
             raise PreventUpdate
+        
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        style = current_style or {'display': 'none'}
+        
+        # Get the current style or use default
+        style = current_style.copy() if current_style else {
+            'position': 'fixed',
+            'bottom': '190px',  # Updated position
+            'right': '20px',
+            'width': '350px',
+            'height': '500px',
+            'background': 'white',
+            'border': '1px solid #ccc',
+            'borderRadius': '10px',
+            'boxShadow': '0 4px 12px rgba(0,0,0,0.15)',
+            'zIndex': 9999,
+            'display': 'none'
+        }
+        
         if button_id == 'open-chat-popup':
-            style['display'] = 'block'
+            # Toggle the display
+            if style.get('display') == 'none':
+                style['display'] = 'block'
+            else:
+                style['display'] = 'none'
         elif button_id == 'chat-popup-close':
             style['display'] = 'none'
+        
         return style
+
 
     @_app.callback(
         Output('chat-session-id', 'data'),
@@ -541,57 +565,122 @@ def register_callbacks(_app):
         return current_session_id
 
     # CONSOLIDATED CHAT MESSAGE CALLBACK (handles both chat-display.children and chat-input.value)
+    # Callback 1: Handle immediate user message display and input clearing
     @_app.callback(
-    [Output('chat-display', 'children'),
-     Output('chat-input', 'value')],
-    [Input('send-button', 'n_clicks')],  # Change from 'chat-send-btn' to 'send-button'
-    [State('chat-input', 'value'),
-     State('chat-display', 'children'),
-     State('chat-session-id', 'data'),
-     State('session-store', 'children')],  # Add session-store as backup
-    prevent_initial_call=True
-        )
-    def update_chat_consolidated(send_clicks, user_message, chat_history, chat_session_id, session_store):
-        if not user_message:
+        [Output('chat-display', 'children'),
+        Output('chat-input', 'value'),
+        Output('pending-message', 'data')],  # Store pending message for bot response
+        [Input('send-button', 'n_clicks'),
+        Input('chat-input', 'n_submit')],  # Handle Enter key
+        [State('chat-input', 'value'),
+        State('chat-display', 'children')],
+        prevent_initial_call=True
+    )
+    def handle_user_message(send_clicks, n_submit, user_message, chat_history):
+        if not user_message or not user_message.strip():
             raise PreventUpdate
-        
-        # Use session_store as backup if chat_session_id is None
-        session_id = chat_session_id or session_store or str(uuid.uuid4())
         
         # Initialize chat_history if it's None
         if chat_history is None:
             chat_history = []
         
+        # Add user message immediately
+        user_msg_div = html.Div([
+            html.Strong("You: ", style={'color': '#333'}),
+            html.Span(user_message.strip())
+        ], style={
+            'margin': '5px 0', 
+            'padding': '8px',
+            'backgroundColor': '#e3f2fd',
+            'borderRadius': '8px',
+            'wordWrap': 'break-word'
+        })
+        chat_history.append(user_msg_div)
+        
+        # Add "Bot is typing..." indicator
+        typing_div = html.Div([
+            html.Strong("Bot: ", style={'color': '#1976d2'}),
+            html.Span("typing...", style={'fontStyle': 'italic', 'color': '#999'})
+        ], style={
+            'margin': '5px 0', 
+            'padding': '8px',
+            'backgroundColor': '#f5f5f5',
+            'borderRadius': '8px',
+            'animation': 'pulse 1.5s infinite'
+        })
+        chat_history.append(typing_div)
+        
+        # Return updated history, clear input, and store message for bot processing
+        return chat_history, "", user_message.strip()
+
+    # Callback 2: Handle bot response (triggered by pending message)
+    @_app.callback(
+        Output('chat-display', 'children', allow_duplicate=True),
+        Input('pending-message', 'data'),
+        [State('chat-display', 'children'),
+        State('chat-session-id', 'data'),
+        State('session-store', 'children')],
+        prevent_initial_call=True
+    )
+    def handle_bot_response(pending_message, chat_history, chat_session_id, session_store):
+        if not pending_message:
+            raise PreventUpdate
+        
+        # Use session_store as backup if chat_session_id is None
+        session_id = chat_session_id or session_store or str(uuid.uuid4())
+        
+        if chat_history is None:
+            chat_history = []
+        
         try:
-            # Add user message to chat
-            user_msg_div = html.Div(f"You: {user_message}", style={'margin': '5px 0'})
-            chat_history.append(user_msg_div)
-            
-            # Add "thinking" message
-            thinking_div = html.Div("Bot: Thinking... (this may take a few minutes)", 
-                                style={'margin': '5px 0', 'color': 'orange', 'fontStyle': 'italic'})
-            chat_history.append(thinking_div)
-            
             # Get response from agent
-            reply = send_chat_message(user_message, session_id)
+            reply = send_chat_message(pending_message, session_id)
             
-            # Remove "thinking" message and add actual response
-            chat_history.pop()  # Remove thinking message
-            bot_msg_div = html.Div(f"Bot: {reply}", style={'margin': '5px 0', 'color': 'blue'})
+            # Remove "typing..." indicator (should be the last message)
+            if chat_history and len(chat_history) > 0:
+                # Check if last message contains "typing..."
+                last_msg = chat_history[-1]
+                if hasattr(last_msg, 'children') and len(last_msg.children) > 1:
+                    if "typing..." in str(last_msg.children[1].children):
+                        chat_history.pop()
+            
+            # Add bot response
+            bot_msg_div = html.Div([
+                html.Strong("Bot: ", style={'color': '#1976d2'}),
+                html.Span(reply)
+            ], style={
+                'margin': '5px 0', 
+                'padding': '8px',
+                'backgroundColor': '#e8f5e8',
+                'borderRadius': '8px',
+                'wordWrap': 'break-word'
+            })
             chat_history.append(bot_msg_div)
             
-            return chat_history, ""  # Return updated history and clear input
+            return chat_history
             
         except Exception as e:
-            # Remove "thinking" message if it exists
+            # Remove "typing..." indicator if it exists
             if chat_history and len(chat_history) > 0:
-                last_msg = str(chat_history[-1])
-                if "Thinking..." in last_msg:
-                    chat_history.pop()
+                last_msg = chat_history[-1]
+                if hasattr(last_msg, 'children') and len(last_msg.children) > 1:
+                    if "typing..." in str(last_msg.children[1].children):
+                        chat_history.pop()
             
-            error_div = html.Div(f"Error: {str(e)}", style={'margin': '5px 0', 'color': 'red'})
+            # Add error message
+            error_div = html.Div([
+                html.Strong("Error: ", style={'color': '#d32f2f'}),
+                html.Span(str(e))
+            ], style={
+                'margin': '5px 0', 
+                'padding': '8px',
+                'backgroundColor': '#ffebee',
+                'borderRadius': '8px',
+                'color': '#d32f2f',
+                'wordWrap': 'break-word'
+            })
             chat_history.append(error_div)
-            return chat_history, ""  # Return updated history and clear input
+            return chat_history
 
     # Remove the old chat callback that was causing the duplicate error
     # The old callback for 'chat-history' 'value' has been removed

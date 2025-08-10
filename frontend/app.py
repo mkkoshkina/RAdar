@@ -21,8 +21,8 @@ app.layout = html.Div([
         "💬", id="open-chat-popup", n_clicks=0,  # Added chat emoji
         style={
             'position': 'fixed',
-            'bottom': '20px',
-            'right': '20px',
+            'bottom': '120px',
+            'right': '40px',
             'zIndex': 9998,
             'background': '#007bff',
             'color': 'white',
@@ -32,11 +32,57 @@ app.layout = html.Div([
             'height': '60px',
             'fontSize': '24px',
             'boxShadow': '0 2px 8px rgba(0,0,0,0.2)',
-            'cursor': 'pointer'
+            'cursor': 'pointer',
+            'transition': 'all 0.3s ease'  # Added smooth transition
         }
     ),
+    dcc.Store(id='chat-popup-visible', data=False),  # Add this to store popup state
+
     chat_popup(),
 ])
+
+# Add external CSS for hover effects
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <style>
+            #open-chat-popup:hover {
+                background: #0056b3 !important;
+                transform: scale(1.05) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            }
+            
+            #open-chat-popup:active {
+                transform: scale(0.95) !important;
+            }
+            
+            #send-button:hover {
+                background: #0056b3 !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+            }
+            
+            #send-button:active {
+                transform: translateY(0px) !important;
+                background: #004494 !important;
+            }
+        </style>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 
 if __name__ == '__main__':
     register_callbacks(app)
