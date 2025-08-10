@@ -755,20 +755,24 @@ def create_drug_annotation_section(sample):
         
         df = pd.read_csv(csv_path)
 
-        required_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Phenotype Categories']
-        df.rename(columns={"CHROM": "Chromosome", "POS": "Position", "ID_x": "SNP ID", "REF": "Reference Allele", "ALT": "Alternate Allele"}, inplace=True)
-        available_columns = [col for col in required_columns if col in df.columns]
+        original_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        available_original_columns = [col for col in original_columns if col in df.columns]
         
-        if not available_columns:
+        if not available_original_columns:
             return html.Div([
                 html.P("Required columns not found in the drug annotation file.", 
                        style={'color': '#dc3545', 'fontStyle': 'italic'})
             ])
         
+        df.rename(columns={"CHROM": "Chromosome", "POS": "Position", "ID_x": "SNP ID", "REF": "Reference Allele", "ALT": "Alternate Allele", 'sample': 'Sample'}, inplace=True)
+        
+        renamed_columns = ['Chromosome', 'Position', 'SNP ID', 'Reference Allele', 'Alternate Allele', 'Sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        available_columns = [col for col in renamed_columns if col in df.columns]
+        
         df_filtered = df[available_columns].copy()
         
         df_filtered = df_filtered.dropna(how='all')
-        df_filtered = df_filtered[df_filtered['sample'].str.contains('1/0|0/1|1/1', na=False)]
+        df_filtered = df_filtered[df_filtered['Sample'].str.contains('1/0|0/1|1/1', na=False)]
 
         if df_filtered.empty:
             return html.Div([
@@ -780,47 +784,51 @@ def create_drug_annotation_section(sample):
             html.P(f"Showing {len(df_filtered)} drug-gene interactions from your genetic data", 
                    style={'marginBottom': '15px', 'color': '#666'}),
             
-            dash_table.DataTable(
-                columns=[
-                    {'name': col, 'id': col} for col in df_filtered.columns
-                ],
-                data=df_filtered.to_dict('records'),
-                style_table={
-                    'maxHeight': '400px', 
-                    'overflowY': 'auto',
-                    'overflowX': 'auto',
-                    'fontSize': '14px',
-                    'border': '1px solid #ddd'
-                },
-                style_cell={
-                    'textAlign': 'left', 
-                    'padding': '8px', 
-                    'fontFamily': 'Arial', 
-                    'fontSize': '13px',
-                    'whiteSpace': 'normal',
-                    'height': 'auto',
-                    'minWidth': '100px',
-                    'maxWidth': '200px',
-                },
-                style_header={
-                    'fontWeight': 'bold', 
-                    'backgroundColor': '#f8f9fa', 
-                    'fontSize': '14px',
-                    'border': '1px solid #ddd'
-                },
-                style_data={
-                    'border': '1px solid #ddd'
-                },
-                style_data_conditional=[
-                    {
-                        'if': {'row_index': 'odd'},
-                        'backgroundColor': '#f9f9f9'
-                    }
-                ],
-                page_size=20,  
-                sort_action="native", 
-                filter_action="native" 
-            ),
+            html.Div([
+                dash_table.DataTable(
+                    columns=[
+                        {'name': col, 'id': col} for col in df_filtered.columns
+                    ],
+                    data=df_filtered.to_dict('records'),
+                    style_table={
+                        'maxHeight': '400px', 
+                        'overflowY': 'auto',
+                        'overflowX': 'auto',
+                        'fontSize': '14px',
+                        'border': '1px solid #ddd',
+                        'minWidth': '100%'
+                    },
+                    style_cell={
+                        'textAlign': 'left', 
+                        'padding': '8px', 
+                        'fontFamily': 'Arial', 
+                        'fontSize': '13px',
+                        'whiteSpace': 'nowrap',  # Changed from 'normal' to 'nowrap' to prevent text wrapping
+                        'height': 'auto',
+                        'minWidth': '120px',  # Increased minimum width
+                        'maxWidth': 'none',   # Removed max width restriction
+                    },
+                    style_header={
+                        'fontWeight': 'bold', 
+                        'backgroundColor': '#f8f9fa', 
+                        'fontSize': '14px',
+                        'border': '1px solid #ddd',
+                        'whiteSpace': 'nowrap'  # Prevent header text from wrapping
+                    },
+                    style_data={
+                        'border': '1px solid #ddd'
+                    },
+                    style_data_conditional=[
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': '#f9f9f9'
+                        }
+                    ],
+                    page_size=20,  
+                    sort_action="native", 
+                    filter_action="native" 
+                )
+            ], style={'overflowX': 'auto', 'width': '100%'}),  # Added container with horizontal scroll
             
             html.Div([
                 html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
