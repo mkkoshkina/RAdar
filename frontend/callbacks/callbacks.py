@@ -649,7 +649,7 @@ def register_callbacks(_app):
             
             # Add bot response
             bot_msg_div = html.Div([
-                html.Strong("Bot: ", style={'color': '#1976d2'}),
+                html.Strong("Mr. Think-Think: ", style={'color': '#1976d2'}),
                 html.Span(reply)
             ], style={
                 'margin': '5px 0', 
