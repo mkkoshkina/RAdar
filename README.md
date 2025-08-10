@@ -38,9 +38,38 @@ docker-compose up --build
 
 4. Once the application is running, access it in your web browser at `http://localhost:9002`.
 
+## 📊 Repository Structure
+
+This repository contains:
+
+1. **Web application**: A Dash-based web application - frontend/
+2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
+
+## ⚠️ Important Disclaimers
+
+- **Not for medical diagnosis**: Results are for research and educational purposes only
+- **Consult healthcare providers**: Always discuss genetic risk with qualified medical professionals
+- **Population specificity**: Risk scores may vary by ancestry and population
+- **Privacy**: Your genetic data is processed locally and not stored permanently. Security is ensured through a JWT token given to each user upon session initialization. 
+
+## 🆘 Support
+
+If you encounter issues:
+1. Check error details
+2. Ensure your VCF file format is correct
+3. Verify your genome build matches GRCh37
+4. Open an issue in this repository
+5. Contact support via Telegram: @mkkoshkina
+
+## 📚 Learn More
+
+- [Understanding Polygenic Risk Scores](https://www.nature.com/articles/s41596-020-0353-1)
+- [Rheumatoid Arthritis](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648)
+- [VCF File Format Guide](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/)
+
 ---
 
-## Command-line Usage
+## Command-line Usage For Advanced Users
 
 You can also interact with the service using command-line tools like `curl`.
 
@@ -85,36 +114,5 @@ The API will return a JSON response with the results or an error message:
 - Docker
 - Minimum 4GB RAM
 - 2GB free disk space
-
-## 📊 Repository Structure
-
-This repository contains:
-
-1. **Web application**: A Dash-based web application - frontend/
-2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
-
-## ⚠️ Important Disclaimers
-
-- **Not for medical diagnosis**: Results are for research and educational purposes only
-- **Consult healthcare providers**: Always discuss genetic risk with qualified medical professionals
-- **Population specificity**: Risk scores may vary by ancestry and population
-- **Privacy**: Your genetic data is processed locally and not stored permanently. Security is ensured through a JWT token given to each user upon session initialization. 
-
-## 🆘 Support
-
-If you encounter issues:
-1. Check error details
-2. Ensure your VCF file format is correct
-3. Verify your genome build matches GRCh37
-4. Open an issue in this repository
-5. Contact support via Telegram: @mkkoshkina
-
-## 📚 Learn More
-
-- [Understanding Polygenic Risk Scores](https://www.nature.com/articles/s41596-020-0353-1)
-- [Rheumatoid Arthritis](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648)
-- [VCF File Format Guide](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/)
-
----
 
 **Made with ❤️ for advancing personalized medicine research**
