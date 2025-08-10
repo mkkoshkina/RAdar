@@ -8,6 +8,8 @@ jupyter_notebooks/yet_another_final_PGS000195_metadata.csv
 input/
 output/
 *.png
+rs*.png
+!logo.png
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml

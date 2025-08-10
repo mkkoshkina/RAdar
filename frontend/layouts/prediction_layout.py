@@ -292,15 +292,6 @@ def create_risk_results(plink_data=None, error_message=None):
             })
         ], style={'display': 'flex', 'flexDirection': 'row'}),
 
-        html.Div([
-            html.H5("Risk Factors Identified:", style={'margin': '15px 0 10px 0'}),
-            html.Ul([
-                html.Li("HLA-DRB1 gene variants associated with rheumatoid arthritis"),
-                html.Li("PTPN22 polymorphisms linked to autoimmune conditions"),
-                html.Li("IL-1 gene cluster variations affecting inflammation"),
-                html.Li("COL1A1 variants related to cartilage integrity")
-            ])
-        ]) if risk_label in ['higher than average', 'high'] else "",
 
         html.Div([
             html.H5("Recommendations:", style={'margin': '15px 0 10px 0'}),
@@ -916,7 +907,7 @@ def create_drug_annotation_section(sample):
                     html.Li("The column sample shows your genotype for each variant. 1/1 - both alleles are present, 1/0 or 0/1 - one allele is present"),
                     html.Li("The column Drugs shows the drugs that may be affected by these variants"),
                     html.Li("The column Phenotype Categories shows the type of effect the variant has on drug response"),
-                    html.Li("You can fillter and sort the table to find specific variants or drugs")
+                    html.Li("You can filter and sort the table to find specific variants or drugs")
                 ], style={'color': '#666', 'fontSize': '14px'})
             ], style={
                 'backgroundColor': '#f8f9fa',
