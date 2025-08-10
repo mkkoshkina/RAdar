@@ -479,27 +479,31 @@ def snp_dandelion_plot(sample):
         
         for i, rs_id in enumerate(top_rs_ids):
             image_path = f'input/images/{rs_id}.png'
+            annotation_path = f'input/annotations/snps_annotations/{rs_id}.tsv'
+            
+            snp_components = []
+            
+            snp_components.extend([
+                html.H4(f"#{i+1}: {rs_id}", style={
+                    'textAlign': 'center', 
+                    'margin': '10px 0', 
+                    'color': '#333',
+                    'fontSize': '18px'
+                }),
+                html.P(f"Effect size: {df_sorted[df_sorted['rsid'] == rs_id]['effect_size'].iloc[0]}", style={
+                    'textAlign': 'center', 
+                    'margin': '5px 0 15px 0', 
+                    'color': '#666',
+                    'fontSize': '14px',
+                    'fontWeight': 'bold'
+                })
+            ])
             
             if os.path.exists(image_path):
                 with open(image_path, 'rb') as f:
                     encoded_image = base64.b64encode(f.read()).decode('ascii')
                 
-                effect_size = df_sorted[df_sorted['rsid'] == rs_id]['effect_size'].iloc[0]
-                
-                image_component = html.Div([
-                    html.H4(f"#{i+1}: {rs_id}", style={
-                        'textAlign': 'center', 
-                        'margin': '10px 0', 
-                        'color': '#333',
-                        'fontSize': '18px'
-                    }),
-                    html.P(f"Effect size: {effect_size}", style={
-                        'textAlign': 'center', 
-                        'margin': '5px 0 15px 0', 
-                        'color': '#666',
-                        'fontSize': '14px',
-                        'fontWeight': 'bold'
-                    }),
+                snp_components.append(
                     html.Img(
                         src=f'data:image/png;base64,{encoded_image}',
                         style={
@@ -508,36 +512,13 @@ def snp_dandelion_plot(sample):
                             'height': 'auto',
                             'border': '2px solid #ddd',
                             'borderRadius': '8px',
-                            'boxShadow': '0 2px 4px rgba(0,0,0,0.1)'
+                            'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
+                            'marginBottom': '20px'
                         }
                     )
-                ], style={
-                    'width': '100%',
-                    'maxWidth': '800px', 
-                    'margin': '20px 0', 
-                    'textAlign': 'center',
-                    'padding': '20px',
-                    'border': '1px solid #e0e0e0',
-                    'borderRadius': '10px',
-                    'backgroundColor': '#fafafa'
-                })
-                
-                image_components.append(image_component)
+                )
             else:
-                placeholder_component = html.Div([
-                    html.H4(f"#{i+1}: {rs_id}", style={
-                        'textAlign': 'center', 
-                        'margin': '10px 0', 
-                        'color': '#333',
-                        'fontSize': '18px'
-                    }),
-                    html.P(f"Effect size: {df_sorted[df_sorted['rsid'] == rs_id]['effect_size'].iloc[0]}", style={
-                        'textAlign': 'center', 
-                        'margin': '5px 0 15px 0', 
-                        'color': '#666',
-                        'fontSize': '14px',
-                        'fontWeight': 'bold'
-                    }),
+                snp_components.append(
                     html.Div([
                         html.P(f"Image not found: {rs_id}.png", style={
                             'color': '#999', 
@@ -549,9 +530,97 @@ def snp_dandelion_plot(sample):
                         'borderRadius': '8px',
                         'padding': '40px',
                         'backgroundColor': '#f8f9fa',
-                        'textAlign': 'center'
+                        'textAlign': 'center',
+                        'marginBottom': '20px'
                     })
-                ], style={
+                )
+            
+            if os.path.exists(annotation_path):
+                try:
+                    annotation_df = pd.read_csv(annotation_path, sep='\t')
+                    
+                    if 'NCBI Gene Page' in annotation_df.columns:
+                        annotation_df['NCBI Gene Page'] = annotation_df['NCBI Gene Page'].apply(
+                            lambda x: f"[Link]({x})" if pd.notna(x) and str(x).startswith('http') else x
+                        )
+                    if 'Genomic Browser' in annotation_df.columns:
+                        annotation_df['Genomic Browser'] = annotation_df['Genomic Browser'].apply(
+                            lambda x: f"[Link]({x})" if pd.notna(x) and str(x).startswith('http') else x
+                        )
+                    
+                    snp_components.extend([
+                        html.H5(f"Gene Annotations for {rs_id}", style={
+                            'textAlign': 'center',
+                            'margin': '15px 0 10px 0',
+                            'color': '#333',
+                            'fontSize': '16px'
+                        }),
+                        dash_table.DataTable(
+                            columns=[
+                                {'name': col, 'id': col, 'presentation': 'markdown'} 
+                                if col in ['NCBI Gene Page', 'Genomic Browser'] 
+                                else {'name': col, 'id': col}
+                                for col in annotation_df.columns
+                            ],
+                            data=annotation_df.to_dict('records'),
+                            style_table={
+                                'maxHeight': '300px',
+                                'overflowY': 'auto',
+                                'overflowX': 'auto',
+                                'fontSize': '14px',
+                                'border': '1px solid #ddd',
+                                'marginBottom': '15px'
+                            },
+                            style_cell={
+                                'textAlign': 'left',
+                                'padding': '8px',
+                                'fontFamily': 'Arial',
+                                'fontSize': '12px',
+                                'whiteSpace': 'normal',
+                                'height': 'auto',
+                                'minWidth': '100px'
+                            },
+                            style_header={
+                                'fontWeight': 'bold',
+                                'backgroundColor': '#f8f9fa',
+                                'fontSize': '13px',
+                                'border': '1px solid #ddd',
+                                'textAlign': 'center'
+                            },
+                            style_data={
+                                'border': '1px solid #ddd'
+                            },
+                            style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': '#f9f9f9'
+                                }
+                            ],
+                            markdown_options={'link_target': '_blank'}
+                        )
+                    ])
+                except Exception as e:
+                    snp_components.append(
+                        html.P(f"Error loading annotations for {rs_id}: {str(e)}", style={
+                            'color': '#dc3545',
+                            'fontStyle': 'italic',
+                            'textAlign': 'center',
+                            'margin': '10px 0'
+                        })
+                    )
+            else:
+                snp_components.append(
+                    html.P(f"No annotations found for {rs_id}", style={
+                        'color': '#666',
+                        'fontStyle': 'italic',
+                        'textAlign': 'center',
+                        'margin': '10px 0'
+                    })
+                )
+            
+            image_component = html.Div(
+                snp_components,
+                style={
                     'width': '100%',
                     'maxWidth': '800px', 
                     'margin': '20px 0', 
@@ -560,9 +629,10 @@ def snp_dandelion_plot(sample):
                     'border': '1px solid #e0e0e0',
                     'borderRadius': '10px',
                     'backgroundColor': '#fafafa'
-                })
-                
-                image_components.append(placeholder_component)
+                }
+            )
+            
+            image_components.append(image_component)
         
         return html.Div([
             html.H3("Top 3 SNPs by Effect Size", style={
