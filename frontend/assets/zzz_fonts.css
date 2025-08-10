@@ -1,5 +1,7 @@
 /* Load Montserrat (or swap for your pick) */
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 
 /* Max coverage: html/body/root/app containers + everything inside */
 html, body, #react-entry-point, #_dash-app-content, #_dash-app-content * {
@@ -35,12 +37,15 @@ body {
 }
 
 /* DataTable styling */
+
 .dash-table-container, .dash-table-container *,
 .dash-tooltip, .dash-tooltip * {
   font-family: 'Montserrat', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
 }
 
+
 /* Plotly SVG text */
 .js-plotly-plot .plotly text {
   font-family: 'Montserrat', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
 }
+
