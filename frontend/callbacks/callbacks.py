@@ -526,7 +526,11 @@ def register_callbacks(_app):
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
         style = current_style or {'display': 'none'}
         if button_id == 'open-chat-popup':
-            style['display'] = 'block'
+            # Toggle between open and closed
+            if style.get('display') == 'none':
+                style['display'] = 'block'
+            else:
+                style['display'] = 'none'
         elif button_id == 'chat-popup-close':
             style['display'] = 'none'
         return style

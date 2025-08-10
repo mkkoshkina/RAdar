@@ -53,7 +53,7 @@ def chat_popup():
             ],
             style={
                 'position': 'fixed',
-                'bottom': '90px',
+                'bottom': '100px',
                 'right': '20px',
                 'width': '350px',
                 'height': '500px',
