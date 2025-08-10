@@ -90,8 +90,8 @@ The API will return a JSON response with the results or an error message:
 
 This repository contains:
 
-1. **Service Platform**: Web API for processing genetic data
-2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing
+1. **Web application**: A Dash-based web application - frontend/
+2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
 
 ## ⚠️ Important Disclaimers
 
