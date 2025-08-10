@@ -103,16 +103,17 @@ This repository contains:
 ## 🆘 Support
 
 If you encounter issues:
-1. Check the log files for error details
+1. Check error details
 2. Ensure your VCF file format is correct
 3. Verify your genome build matches GRCh37
 4. Open an issue in this repository
+5. Contact support via Telegram: @mkkoshkina
 
 ## 📚 Learn More
 
-- [Understanding Polygenic Risk Scores](link-to-resource)
-- [Rheumatoid Arthritis Genetics](link-to-resource)
-- [VCF File Format Guide](link-to-resource)
+- [Understanding Polygenic Risk Scores]([link-to-resource](https://www.nature.com/articles/s41596-020-0353-1))
+- [Rheumatoid Arthritis Genetics]([link-to-resource](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648))
+- [VCF File Format Guide]([link-to-resource](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/))
 
 ---
 
