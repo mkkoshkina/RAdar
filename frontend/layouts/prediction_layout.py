@@ -7,6 +7,8 @@ from statistics import quantiles
 from scipy.stats import percentileofscore
 import math
 import random
+import base64
+import os
 from pathlib import Path
 
 from frontend.data.remote_data import fetch_user_balance, fetch_prediction_history
@@ -463,8 +465,126 @@ def create_variants_section(sample):
     ])
 
 
-def snp_dandelion_plot():
-    return html.Div('Here be the SNP Dandelion Plot')
+def snp_dandelion_plot(sample):
+    tsv_path = f'output/{sample}_final_prs_table.tsv'
+    try:
+        df = pd.read_csv(tsv_path, sep='\t')
+        df_sorted = df.sort_values('effect_size', ascending=False).head(3)
+        df_sorted = df_sorted.copy()
+        df_sorted['effect_size'] = df_sorted['effect_size'].round(4)
+        
+        top_rs_ids = df_sorted['rsid'].tolist()
+        
+        image_components = []
+        
+        for i, rs_id in enumerate(top_rs_ids):
+            image_path = f'input/images/{rs_id}.png'
+            
+            if os.path.exists(image_path):
+                with open(image_path, 'rb') as f:
+                    encoded_image = base64.b64encode(f.read()).decode('ascii')
+                
+                effect_size = df_sorted[df_sorted['rsid'] == rs_id]['effect_size'].iloc[0]
+                
+                image_component = html.Div([
+                    html.H4(f"#{i+1}: {rs_id}", style={
+                        'textAlign': 'center', 
+                        'margin': '10px 0', 
+                        'color': '#333',
+                        'fontSize': '18px'
+                    }),
+                    html.P(f"Effect size: {effect_size}", style={
+                        'textAlign': 'center', 
+                        'margin': '5px 0 15px 0', 
+                        'color': '#666',
+                        'fontSize': '14px',
+                        'fontWeight': 'bold'
+                    }),
+                    html.Img(
+                        src=f'data:image/png;base64,{encoded_image}',
+                        style={
+                            'width': '100%', 
+                            'maxWidth': '800px', 
+                            'height': 'auto',
+                            'border': '2px solid #ddd',
+                            'borderRadius': '8px',
+                            'boxShadow': '0 2px 4px rgba(0,0,0,0.1)'
+                        }
+                    )
+                ], style={
+                    'width': '100%',
+                    'maxWidth': '800px', 
+                    'margin': '20px 0', 
+                    'textAlign': 'center',
+                    'padding': '20px',
+                    'border': '1px solid #e0e0e0',
+                    'borderRadius': '10px',
+                    'backgroundColor': '#fafafa'
+                })
+                
+                image_components.append(image_component)
+            else:
+                placeholder_component = html.Div([
+                    html.H4(f"#{i+1}: {rs_id}", style={
+                        'textAlign': 'center', 
+                        'margin': '10px 0', 
+                        'color': '#333',
+                        'fontSize': '18px'
+                    }),
+                    html.P(f"Effect size: {df_sorted[df_sorted['rsid'] == rs_id]['effect_size'].iloc[0]}", style={
+                        'textAlign': 'center', 
+                        'margin': '5px 0 15px 0', 
+                        'color': '#666',
+                        'fontSize': '14px',
+                        'fontWeight': 'bold'
+                    }),
+                    html.Div([
+                        html.P(f"Image not found: {rs_id}.png", style={
+                            'color': '#999', 
+                            'fontStyle': 'italic',
+                            'margin': '20px'
+                        })
+                    ], style={
+                        'border': '2px dashed #ccc',
+                        'borderRadius': '8px',
+                        'padding': '40px',
+                        'backgroundColor': '#f8f9fa',
+                        'textAlign': 'center'
+                    })
+                ], style={
+                    'width': '100%',
+                    'maxWidth': '800px', 
+                    'margin': '20px 0', 
+                    'textAlign': 'center',
+                    'padding': '20px',
+                    'border': '1px solid #e0e0e0',
+                    'borderRadius': '10px',
+                    'backgroundColor': '#fafafa'
+                })
+                
+                image_components.append(placeholder_component)
+        
+        return html.Div([
+            html.H3("Top 3 SNPs by Effect Size", style={
+                'textAlign': 'center', 
+                'margin': '20px 0 30px 0', 
+                'color': '#333'
+            }),
+            html.Div(image_components, style={
+                'display': 'flex', 
+                'flexDirection': 'column',
+                'alignItems': 'center',
+                'gap': '30px'
+            })
+        ])
+        
+    except Exception as e:
+        return html.Div([
+            html.P(f"Error loading SNP plots: {str(e)}", 
+                   style={'color': '#dc3545', 'fontStyle': 'italic', 'textAlign': 'center'})
+        ])
+
+
 
 def create_top_10_snps_section(sample):
     
@@ -741,10 +861,12 @@ def prediction_layout(user_session):
             html.Div(id='variants-section-content')  
         ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
+
         html.Div([
             html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
         ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
+
 
         html.Div([
             html.H3("Mutations Responsible For Drug Efficacy and Toxicity", style={'color': '#333', 'marginBottom': '15px'}),
@@ -755,6 +877,12 @@ def prediction_layout(user_session):
             html.H3("Top 10 Most Influential SNPs", style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='top-10-snps-content')
         ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
+
+         html.Div([
+            html.H3("Top 3 SNPs Visualization", style={'color': '#333', 'marginBottom': '15px'}),
+            html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
+        ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
+
 
         html.Div([
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
