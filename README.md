@@ -13,6 +13,17 @@ RAdar helps you understand your genetic predisposition to rheumatoid arthritis b
 ### What is a Polygenic Risk Score?
 A Polygenic Risk Score combines information from multiple genetic variants to estimate your genetic risk for developing rheumatoid arthritis compared to the general population. **Important**: This is for educational purposes only and should not replace professional medical advice.
 
+
+## 📊 Repository Structure
+
+This repository contains:
+
+1. **Web application**: A Dash-based web application - frontend/
+2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
+3. **AI Assistant**: Based on Qwen3
+
+![App Overview](frontend/assets/pipeline_overview.png)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -62,16 +73,6 @@ RAdar’s web application offers a user-friendly experience with the following k
   - Ask questions about your PRS, what it means, and how to understand the genetic factors involved, key genes, proteins and mutations.
 
 These features make RAdar not only a powerful analytics platform but also an accessible educational tool for users seeking to understand their genetic risk for rheumatoid arthritis.
-
-## 📊 Repository Structure
-
-This repository contains:
-
-1. **Web application**: A Dash-based web application - frontend/
-2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
-3. **AI Assistant**: Based on Qwen3
-
-![App Overview](frontend/assets/pipeline_overview.png)
 
 ## ⚠️ Important Disclaimers
 
