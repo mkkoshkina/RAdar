@@ -5,6 +5,7 @@ from pydantic import BaseModel
 import httpx
 import os
 import logging
+import re
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +25,19 @@ class ChatResponse(BaseModel):
 
 # Get the agent API URL from environment variable
 AGENT_API_URL = os.environ.get("AGENT_API_URL", "http://176.108.244.85:8888")
+
+def clean_response(response_text: str) -> str:
+    """
+    Remove <think> tags and their content from the response.
+    """
+    # Remove <think>...</think> blocks (including multiline)
+    cleaned = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+    
+    # Clean up any extra whitespace that might be left
+    cleaned = re.sub(r'\n\s*\n', '\n', cleaned)  # Remove multiple empty lines
+    cleaned = cleaned.strip()  # Remove leading/trailing whitespace
+    
+    return cleaned
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -55,7 +69,12 @@ async def chat(request: ChatRequest):
             logger.info(f"Response data received: {len(response_data.get('reply', ''))} characters")
             
             reply = response_data["reply"]
-            return ChatResponse(response=reply)
+            
+            # Clean the response to remove <think> tags
+            cleaned_reply = clean_response(reply)
+            logger.info(f"Cleaned response: {len(cleaned_reply)} characters (removed think tags)")
+            
+            return ChatResponse(response=cleaned_reply)
             
     except httpx.ConnectError as e:
         error_msg = f"Connection error to agent API: {e}"

@@ -599,7 +599,7 @@ def register_callbacks(_app):
         
         # Add "Bot is typing..." indicator
         typing_div = html.Div([
-            html.Strong("Bot: ", style={'color': '#1976d2'}),
+            html.Strong("Mr. Think-think: ", style={'color': '#1976d2'}),
             html.Span("typing...", style={'fontStyle': 'italic', 'color': '#999'})
         ], style={
             'margin': '5px 0', 
