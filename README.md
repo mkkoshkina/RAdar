@@ -1,3 +1,7 @@
+<h1>
+  <img src="frontend/assets/logo.png" alt="Logo" width="40" style="vertical-align:middle; margin-right:10px;">
+  RAdar: SNP2Risk for Rheumatoid Arthritis
+</h1>
 # RAdar: SNP2Risk for Rheumatoid Arthritis
 
 🧬 **An accessible web-based tool that calculates personalized genetic risk scores for rheumatoid arthritis (RA)**
