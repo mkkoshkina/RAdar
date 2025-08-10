@@ -20,6 +20,7 @@ hero_style = {
     "borderRadius": "12px",
     "boxShadow": "0 2px 4px rgba(0,0,0,0.06)",
     "border": "1px solid #eaeaea",
+    "textAlign": "center",
 }
 
 cards_wrap_style = {
@@ -52,6 +53,7 @@ btn_row_style = {
     "display": "flex",
     "gap": "12px",
     "flexWrap": "wrap",
+    "justifyContent": "center",
 }
 
 
