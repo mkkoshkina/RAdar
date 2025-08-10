@@ -1,6 +1,7 @@
 import base64
 import os
 import tempfile
+import warnings
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -13,6 +14,9 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 import io
+
+# Suppress pandas FutureWarnings related to groupby operations
+warnings.filterwarnings("ignore", category=FutureWarning, message=".*grouping with a length-1 list-like.*")
 
 from frontend.layouts.prediction_layout import (
     plot_normal_hist, 
@@ -229,6 +233,13 @@ class PDFReportGenerator:
     
     def _generate_risk_plot(self, risk, samples, risk_percentile):
         try:
+            # Check if kaleido is available for image export
+            try:
+                import kaleido
+            except ImportError:
+                print("Warning: kaleido package not available. Skipping risk plot generation.")
+                return None
+            
             fig = plot_normal_hist(risk, samples, risk_percentile)
             
             img_bytes = pio.to_image(fig, format="png", width=600, height=400)
@@ -242,6 +253,13 @@ class PDFReportGenerator:
     
     def _generate_scatter_plot(self, sample_id):
         try:
+            # Check if kaleido is available for image export
+            try:
+                import kaleido
+            except ImportError:
+                print("Warning: kaleido package not available. Skipping scatter plot generation.")
+                return None
+                
             import plotly.express as px
             
             csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'

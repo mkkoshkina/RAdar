@@ -12,7 +12,8 @@ from dash.exceptions import PreventUpdate
 from frontend.data.local_data import authentificated_session
 from frontend.data.remote_data import fetch_predictions_reports, fetch_users_report, fetch_credits_report
 from frontend.data.remote_data import fetch_transaction_history, deposit_amount, send_prediction_request, \
-    fetch_prediction_history, register_user, fetch_models, authenticate_user, fetch_user_balance, call_plink_prediction
+    fetch_prediction_history, register_user, fetch_models, authenticate_user, fetch_user_balance, call_plink_prediction, \
+    analyze_rheumatoid_arthritis_risk, get_genetic_analysis_cost
 from frontend.layouts.admin_layout import admin_layout
 from frontend.layouts.admin_layout import users_report, predictions_report, credits_report
 from frontend.layouts.billing_layout import billing_layout
@@ -357,14 +358,7 @@ def register_callbacks(_app):
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
                 return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
             
-            vcf_dir = 'input/vcf'
-            os.makedirs(vcf_dir, exist_ok=True)
-            
-            vcf_path = os.path.join(vcf_dir, filename)
-            with open(vcf_path, 'wb') as f:
-                f.write(decoded)
-            
-            plink_result, error = call_plink_prediction(filename)
+            plink_result, error = analyze_rheumatoid_arthritis_risk(decoded, filename, user_session)
             
             if error:
                 risk_results = create_risk_results(error_message=error)

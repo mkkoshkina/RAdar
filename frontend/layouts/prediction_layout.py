@@ -96,6 +96,13 @@ def genetic_upload_form():
         html.P("Upload your sequencing data in VCF format", 
                style={'color': '#666', 'marginBottom': '10px'}),
         
+        html.Div([
+            html.I(className="fas fa-coins", style={'marginRight': '5px', 'color': '#ffc107'}),
+            html.Span("Cost: 50 credits per analysis", 
+                     style={'color': '#666', 'fontSize': '14px', 'fontWeight': 'bold'})
+        ], style={'marginBottom': '15px', 'padding': '8px', 'backgroundColor': '#fff3cd', 
+                 'border': '1px solid #ffeaa7', 'borderRadius': '4px'}),
+        
         dcc.Upload(
             id='upload-genetic-data',
             children=html.Div([

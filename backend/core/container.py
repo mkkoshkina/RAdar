@@ -20,6 +20,7 @@ class Container(containers.DeclarativeContainer):
             "backend.api.v1.endpoints.auth",
             "backend.api.v1.endpoints.billing",
             "backend.api.v1.endpoints.prediction",
+            "backend.api.v1.endpoints.genetic_analysis",
             "backend.core.dependencies",
         ]
     )

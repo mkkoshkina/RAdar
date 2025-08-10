@@ -110,6 +110,44 @@ def call_plink_prediction(vcf_filename):
         return None, str(e)
 
 
+def analyze_rheumatoid_arthritis_risk(vcf_file_content, filename, user_session):
+    try:
+        files = {
+            'vcf_file': (filename, vcf_file_content, 'text/plain')
+        }
+        
+        response = requests.post(
+            f"{API_URL}/v1/genetic-analysis/analyze-rheumatoid-arthritis",
+            files=files,
+            headers={'Authorization': f'Bearer {user_session["access_token"]}'},
+            timeout=300
+        )
+        response.raise_for_status()
+        result = response.json()
+        
+        if result.get("status") == "success" and "analysis_result" in result:
+            return result["analysis_result"], None
+        else:
+            return None, "Analysis failed: No valid result returned"
+            
+    except requests.HTTPError as e:
+        if e.response.status_code == 422:  # Validation error
+            error_detail = e.response.json().get('detail', 'Validation error')
+            return None, error_detail
+        else:
+            return None, f"HTTP error {e.response.status_code}: {e.response.text}"
+    except Exception as e:
+        return None, str(e)
+
+
+def get_genetic_analysis_cost():
+    try:
+        response = api_client.get("/v1/genetic-analysis/cost")
+        return response.get("cost", 50)  
+    except:
+        return 50  
+
+
 import os
 import base64
 import requests
