@@ -284,16 +284,6 @@ def create_risk_results(plink_data=None, error_message=None):
         ], style={'display': 'flex', 'flexDirection': 'row'}),
 
         html.Div([
-            html.H5("Risk Factors Identified:", style={'margin': '15px 0 10px 0'}),
-            html.Ul([
-                html.Li("HLA-DRB1 gene variants associated with rheumatoid arthritis"),
-                html.Li("PTPN22 polymorphisms linked to autoimmune conditions"),
-                html.Li("IL-1 gene cluster variations affecting inflammation"),
-                html.Li("COL1A1 variants related to cartilage integrity")
-            ])
-        ]) if risk_label in ['higher than average', 'high'] else "",
-
-        html.Div([
             html.H5("Recommendations:", style={'margin': '15px 0 10px 0'}),
             html.Ul([
                 html.Li("Consult with a rheumatologist for further evaluation"),
