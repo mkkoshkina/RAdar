@@ -376,26 +376,28 @@ def create_variants_section(sample):
     csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
     tsv_path = f'output/{sample}_final_prs_table.tsv'
 
-    df = pd.read_csv(csv_path)
+    df_metadata = pd.read_csv(csv_path)
     df_snps = pd.read_csv(tsv_path, sep='\t')
 
-    df['is_in_sample'] = df['rsID'].isin(df_snps['rsid'])
-    df['color'] = df['is_in_sample'].map({True: 'red', False: 'blue'})
+    df = pd.merge(df_metadata, df_snps, left_on='rsID', right_on='rsid', how='inner')
 
     if 'Sources' in df.columns:
         df['Sources'] = df['Sources'].apply(format_links)
 
-    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description','color','is_in_sample']]
+    df['effect_weight_display'] = df['effect_size']  
+    
+    df = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','effect_weight_display','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
 
     df_display = df[['Sources','rsID','Chromosome','Position','Effect allele','Other allele','Effect weight','Odds ratio','Gene symbol','Ensembl gene ID','Gene description']]
 
     fig = px.scatter(
         df,
         x='Position',
-        y='Effect weight',
-        color='color',
-        color_discrete_map={'red': 'red', 'blue': 'blue'},
-        hover_data={'Chromosome': False, 'Position': True, 'Effect weight': True, 'color': False, 'is_in_sample': False},
+        y='effect_weight_display',
+        color='effect_weight_display',
+        color_continuous_scale='RdYlBu_r',  
+        hover_data={'Chromosome': False, 'Position': True, 'effect_weight_display': True},
+        labels={'effect_weight_display': 'Effect Weight'}
     )
 
     fig.update_traces(
@@ -448,9 +450,9 @@ def create_variants_section(sample):
         html.Div([
                 html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
                 html.Ul([
-                    html.Li("This section shows the genetic variants associated with rheumatoid arthritis, each point represents a mutation"),
+                    html.Li("This section shows the genetic variants associated with rheumatoid arthritis that are present in your genetic data"),
                     html.Li("The x-axis shows the genomic position of the variant, y-axis shows the effect size of the variant on rheumatoid arthritis risk"),
-                    html.Li(["Red points indicate variants present in", html.B(" your genetic data")]),
+                    html.Li(["Color intensity indicates effect strength: ", html.B("red/warm colors = stronger effect"), ", ", html.B("blue/cool colors = weaker effect")]),
                     html.Li("If you hover over a point, you will see more information about the variant"),
                     html.Li("The table below the plot shows detailed information about the variants, such as the gene name and symbol, chromosome, position and etc."),
                     html.Li([html.B("You can click on the links in the Sources column to learn more about each variant")])
