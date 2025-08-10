@@ -4,7 +4,7 @@
 
 ## What is RAdar?
 
-RAdar helps you understand your genetic predisposition to rheumatoid arthritis by analyzing your DNA data. Simply upload your genetic raw data file (VCF format) from popular direct-to-consumer genetic testing services like Genotek and get a personalized Polygenic Risk Score (PRS).
+RAdar helps you understand your genetic predisposition to rheumatoid arthritis by analyzing your DNA sequencing data. Simply upload your genetic raw data file (VCF format) from popular direct-to-consumer genetic testing services like Genotek and get a personalized Polygenic Risk Score (PRS).
 
 ### What is a Polygenic Risk Score?
 A Polygenic Risk Score combines information from multiple genetic variants to estimate your genetic risk for developing rheumatoid arthritis compared to the general population. **Important**: This is for educational purposes only and should not replace professional medical advice.
@@ -98,7 +98,7 @@ This repository contains:
 - **Not for medical diagnosis**: Results are for research and educational purposes only
 - **Consult healthcare providers**: Always discuss genetic risk with qualified medical professionals
 - **Population specificity**: Risk scores may vary by ancestry and population
-- **Privacy**: Your genetic data is processed locally and not stored permanently
+- **Privacy**: Your genetic data is processed locally and not stored permanently. Security is ensured through a JWT token given to each user upon session initialization. 
 
 ## 🆘 Support
 
@@ -112,7 +112,7 @@ If you encounter issues:
 ## 📚 Learn More
 
 - [Understanding Polygenic Risk Scores](https://www.nature.com/articles/s41596-020-0353-1)
-- [Rheumatoid Arthritis Genetics](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648)
+- [Rheumatoid Arthritis](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648)
 - [VCF File Format Guide](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/)
 
 ---
