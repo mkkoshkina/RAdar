@@ -2,6 +2,7 @@ import json
 import os
 import base64
 import math
+import requests  # Add this import
 from datetime import datetime
 from json import JSONDecodeError
 
@@ -25,6 +26,11 @@ from frontend.ui_kit.components.navigation import navigation_bar
 from frontend.ui_kit.components.user_balance import user_balance
 
 from frontend.data.remote_data import send_chat_message
+import uuid
+
+
+# Add this line to get API_URL
+API_URL = os.environ.get("API_URL", "http://localhost:8000/api")
 
 sign_page_last_click_timestamp = datetime.now()
 
@@ -477,10 +483,11 @@ def register_callbacks(_app):
             
         return base_style
 
+    # CONSOLIDATED CHAT CALLBACKS
     @_app.callback(
         Output('chat-popup-container', 'style'),
         [Input('open-chat-popup', 'n_clicks'),
-        Input('chat-popup-close', 'n_clicks')],
+         Input('chat-popup-close', 'n_clicks')],
         [State('chat-popup-container', 'style')],
         prevent_initial_call=True
     )
@@ -489,7 +496,7 @@ def register_callbacks(_app):
         if not ctx.triggered:
             raise PreventUpdate
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        style = current_style or {}
+        style = current_style or {'display': 'none'}
         if button_id == 'open-chat-popup':
             style['display'] = 'block'
         elif button_id == 'chat-popup-close':
@@ -497,16 +504,66 @@ def register_callbacks(_app):
         return style
 
     @_app.callback(
-        Output('chat-history', 'value'),
-        [Input('chat-send-btn', 'n_clicks')],
-        [State('chat-input', 'value'),
-        State('chat-history', 'value'),
-        State('user-session', 'data')],
-        prevent_initial_call=True
+        Output('chat-session-id', 'data'),
+        Input('chat-session-id', 'data')
     )
-    def update_chat(n_clicks, user_message, chat_history, user_session):
+    def initialize_chat_session(current_session_id):
+        if not current_session_id:
+            return str(uuid.uuid4())
+        return current_session_id
+
+    # CONSOLIDATED CHAT MESSAGE CALLBACK (handles both chat-display.children and chat-input.value)
+    @_app.callback(
+    [Output('chat-display', 'children'),
+     Output('chat-input', 'value')],
+    [Input('send-button', 'n_clicks')],  # Change from 'chat-send-btn' to 'send-button'
+    [State('chat-input', 'value'),
+     State('chat-display', 'children'),
+     State('chat-session-id', 'data'),
+     State('session-store', 'children')],  # Add session-store as backup
+    prevent_initial_call=True
+        )
+    def update_chat_consolidated(send_clicks, user_message, chat_history, chat_session_id, session_store):
         if not user_message:
             raise PreventUpdate
-        reply = send_chat_message(user_message, user_session)
-        new_history = (chat_history or '') + f"\nYou: {user_message}\nBot: {reply}"
-        return new_history
+        
+        # Use session_store as backup if chat_session_id is None
+        session_id = chat_session_id or session_store or str(uuid.uuid4())
+        
+        # Initialize chat_history if it's None
+        if chat_history is None:
+            chat_history = []
+        
+        try:
+            # Add user message to chat
+            user_msg_div = html.Div(f"You: {user_message}", style={'margin': '5px 0'})
+            chat_history.append(user_msg_div)
+            
+            # Add "thinking" message
+            thinking_div = html.Div("Bot: Thinking... (this may take a few minutes)", 
+                                style={'margin': '5px 0', 'color': 'orange', 'fontStyle': 'italic'})
+            chat_history.append(thinking_div)
+            
+            # Get response from agent
+            reply = send_chat_message(user_message, session_id)
+            
+            # Remove "thinking" message and add actual response
+            chat_history.pop()  # Remove thinking message
+            bot_msg_div = html.Div(f"Bot: {reply}", style={'margin': '5px 0', 'color': 'blue'})
+            chat_history.append(bot_msg_div)
+            
+            return chat_history, ""  # Return updated history and clear input
+            
+        except Exception as e:
+            # Remove "thinking" message if it exists
+            if chat_history and len(chat_history) > 0:
+                last_msg = str(chat_history[-1])
+                if "Thinking..." in last_msg:
+                    chat_history.pop()
+            
+            error_div = html.Div(f"Error: {str(e)}", style={'margin': '5px 0', 'color': 'red'})
+            chat_history.append(error_div)
+            return chat_history, ""  # Return updated history and clear input
+
+    # Remove the old chat callback that was causing the duplicate error
+    # The old callback for 'chat-history' 'value' has been removed

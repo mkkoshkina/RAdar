@@ -79,3 +79,4 @@ redis==5.0.1
 kombu==5.3.4
 plotly==5.17.0
 scipy==1.11.4
+uuid

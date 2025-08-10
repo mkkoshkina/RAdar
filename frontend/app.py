@@ -1,7 +1,7 @@
 import dash
 from dash import dcc, html
 
-from frontend.callbacks.callbacks import register_callbacks
+from frontend.callbacks.callbacks import register_callbacks  # Remove the 's' from callbacks
 from frontend.ui_kit.styles import page_content_style
 from frontend.ui_kit.components.chat_popup import chat_popup
 
@@ -18,7 +18,7 @@ app.layout = html.Div([
     html.Div(id='nav-bar'),
     html.Div(id='page-content', style=page_content_style),
     html.Button(
-        "Chat", id="open-chat-popup", n_clicks=0,
+        "💬", id="open-chat-popup", n_clicks=0,  # Added chat emoji
         style={
             'position': 'fixed',
             'bottom': '20px',
@@ -30,7 +30,7 @@ app.layout = html.Div([
             'borderRadius': '50%',
             'width': '60px',
             'height': '60px',
-            'fontSize': '22px',
+            'fontSize': '24px',
             'boxShadow': '0 2px 8px rgba(0,0,0,0.2)',
             'cursor': 'pointer'
         }

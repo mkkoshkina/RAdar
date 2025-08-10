@@ -109,10 +109,46 @@ def call_plink_prediction(vcf_filename):
     except Exception as e:
         return None, str(e)
 
-def send_chat_message(message, user_session=None):
+
+import os
+import base64
+import requests
+
+API_URL = os.environ.get("API_URL", "http://localhost:8000/api")
+PLINK_API_URL = os.environ.get("PLINK_API_URL", "http://plink:5000")
+
+
+class APIClient:
+    def __init__(self, base_url=API_URL):
+        self.base_url = base_url
+
+    def _send_request(self, method, path, token=None, timeout=300, **kwargs):  # 5 minute default timeout
+        headers = kwargs.get('headers', {})
+        if token:
+            headers['Authorization'] = f'Bearer {token}'
+        response = requests.request(
+            method, 
+            f"{self.base_url}{path}", 
+            headers=headers, 
+            timeout=timeout,  # Add timeout parameter
+            **kwargs
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get(self, path, token=None, timeout=300, **kwargs):
+        return self._send_request('GET', path, token=token, timeout=timeout, **kwargs)
+
+    def post(self, path, token=None, timeout=300, **kwargs):
+        return self._send_request('POST', path, token=token, timeout=timeout, **kwargs)
+
+api_client = APIClient()
+
+def send_chat_message(message, session_id):
     client = APIClient()
-    token = user_session.get('access_token') if user_session else None
-    response = client.post('/v1/chat/', token=token, json={'message': message})
-    if response and 'reply' in response:
-        return response['reply']
+    response = client.post('/v1/chatbot/chat', 
+                          json={'message': message, 'session_id': session_id},
+                          timeout=300)  # 5 minutes timeout
+    if response and 'response' in response:
+        return response['response']
     return "No response from server."
