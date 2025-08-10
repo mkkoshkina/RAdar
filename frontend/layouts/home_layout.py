@@ -99,7 +99,7 @@ The PRS is an adjunctive tool, not a diagnostic test. It should be interpreted i
 
 def hero_section(app_name: str):
     return html.Div([
-        html.H1("Welcome to SNP2Risk-RA", style={
+        html.H1("Welcome to RAdar - Rheumatoid Arthritis (RA) risk predictor", style={
             'margin': '0 0 15px 0', 
             'fontSize': '2.8rem', 
             'fontWeight': '700',
