@@ -16,14 +16,6 @@ A Polygenic Risk Score combines information from multiple genetic variants to es
 - Docker installed on your system
 - Basic familiarity with command line tools
 
-### Getting Your Genetic Data
-Most genetic testing companies provide raw data downloads:
-- **23andMe**: Go to "Browse Raw Data" → "Download"
-- **AncestryDNA**: Access "Your DNA Results Summary" → "Download Raw DNA Data"
-- **MyHeritage**: Navigate to "Manage DNA Kit" → "Download Raw Data"
-
-*Note: You may need to convert your data to VCF format if it's in a different format.*
-
 ## 📋 How to Use
 # RAdar Documentation
 
