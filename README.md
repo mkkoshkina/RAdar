@@ -67,6 +67,8 @@ This repository contains:
 2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
 3. **AI Assistant**: Based on Qwen3
 
+![App Overview](assets/images/pipeline_overview.png)
+
 ## ⚠️ Important Disclaimers
 
 - **Not for medical diagnosis**: Results are for research and educational purposes only
