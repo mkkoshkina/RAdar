@@ -331,7 +331,8 @@ def register_callbacks(_app):
          Output('drug-annotation-content', 'children'),
          Output('top-10-snps-section', 'style'),
          Output('top-10-snps-content', 'children'),
-         Output('pdf_report-section', 'style')],
+         Output('pdf_report-section', 'style'),
+         Output('user-session', 'data', allow_duplicate=True)],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
          State('upload-genetic-data', 'filename'),
@@ -354,7 +355,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
             
             vcf_dir = 'input/vcf'
             os.makedirs(vcf_dir, exist_ok=True)
@@ -371,7 +372,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
@@ -382,6 +383,11 @@ def register_callbacks(_app):
                 top_10_snps_content = create_top_10_snps_section(sample_name)
                 variants_section_content = create_variants_section(sample_name)
                 snp_dandelion_content = snp_dandelion_plot(sample_name)
+                
+                # Store prediction data in session for PDF generation
+                updated_session = user_session.copy()
+                updated_session['latest_sample_id'] = sample_name
+                updated_session['latest_plink_data'] = plink_data
             else:
                 error_msg = plink_result.get('error', 'Unknown error')
                 risk_results = create_risk_results(error_message=error_msg)
@@ -389,7 +395,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
@@ -398,12 +404,12 @@ def register_callbacks(_app):
             visible_style = {**card_style, 'display': 'block'}
             hidden_style = {**card_style, 'display': 'none'}
             sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style
+            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
         
-        return risk_results, variants_section_content, user_balance(balance), visible_style, visible_style, visible_style, snp_dandelion_content, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style
+        return risk_results, variants_section_content, user_balance(balance), visible_style, visible_style, visible_style, snp_dandelion_content, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style, updated_session
 
     @_app.callback(
         Output('prediction-history-table', 'children', allow_duplicate=True),
@@ -685,5 +691,49 @@ def register_callbacks(_app):
             chat_history.append(error_div)
             return chat_history
 
-    # Remove the old chat callback that was causing the duplicate error
-    # The old callback for 'chat-history' 'value' has been removed
+    @_app.callback(
+        Output('download-pdf-button', 'disabled'),
+        [Input('risk-results', 'children')],
+        prevent_initial_call=True
+    )
+    def enable_pdf_download(risk_results):
+        if risk_results and len(risk_results) > 0:
+            return False
+        return True
+
+    @_app.callback(
+        Output('download-component', 'data'),
+        [Input('download-pdf-button', 'n_clicks')],
+        [State('user-session', 'data')],
+        prevent_initial_call=True
+    )
+    def download_pdf_report(n_clicks, user_session):
+        if not n_clicks or not user_session:
+            raise PreventUpdate
+        
+        try:
+            from frontend.services.pdf_service import pdf_generator
+            
+            sample_id = user_session.get('latest_sample_id')
+            plink_data = user_session.get('latest_plink_data')
+            
+            if not sample_id or not plink_data:
+                print("No sample_id or plink_data found in session")
+                raise PreventUpdate
+            
+            pdf_b64 = pdf_generator.generate_pdf_report(plink_data, sample_id)
+            
+            if pdf_b64:
+                return {
+                    'content': pdf_b64,
+                    'filename': f'rheumatoid_arthritis_report_{sample_id}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+                    'type': 'application/pdf',
+                    'base64': True
+                }
+            else:
+                print("PDF generation returned None")
+                raise PreventUpdate
+                
+        except Exception as e:
+            print(f"Error generating PDF: {str(e)}")
+            raise PreventUpdate

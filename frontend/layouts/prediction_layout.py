@@ -973,6 +973,7 @@ def prediction_layout(user_session):
             html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
             html.Button('Download PDF Report', id='download-pdf-button', className='btn-primary', 
             style=primary_button_style, disabled=True),
+            dcc.Download(id='download-component')
         ], className='card', style={**card_style, 'display': 'none'}, id='pdf_report-section')
 
         
