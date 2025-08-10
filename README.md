@@ -108,14 +108,6 @@ This repository contains:
 - **Population specificity**: Risk scores may vary by ancestry and population
 - **Privacy**: Your genetic data is processed locally and not stored permanently
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for more information.
-
-## 📄 License
-
-[Add license information here]
-
 ## 🆘 Support
 
 If you encounter issues:
