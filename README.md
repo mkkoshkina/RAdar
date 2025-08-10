@@ -111,9 +111,9 @@ If you encounter issues:
 
 ## 📚 Learn More
 
-- [Understanding Polygenic Risk Scores]([link-to-resource](https://www.nature.com/articles/s41596-020-0353-1))
-- [Rheumatoid Arthritis Genetics]([link-to-resource](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648))
-- [VCF File Format Guide]([link-to-resource](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/))
+- [Understanding Polygenic Risk Scores](https://www.nature.com/articles/s41596-020-0353-1)
+- [Rheumatoid Arthritis Genetics](https://www.mayoclinic.org/diseases-conditions/rheumatoid-arthritis/symptoms-causes/syc-20353648)
+- [VCF File Format Guide](https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/)
 
 ---
 
