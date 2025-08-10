@@ -37,12 +37,35 @@ docker-compose up --build
 
 4. Once the application is running, access it in your web browser at `http://localhost:9002`.
 
+## ✨ Features & Functionality
+
+RAdar’s web application offers a user-friendly experience with the following key features:
+
+### 📈 Interactive Reports with Visualizations
+
+- **Personalized Risk Dashboard:** After uploading your VCF file, receive a comprehensive report summarizing your Polygenic Risk Score (PRS) for rheumatoid arthritis and key mutations.
+- **Data Visualizations:** The report includes a variety of easy-to-understand plots and charts, such as:
+  - Your PRS compared to the general population
+  - Distribution of risk alleles and detailed info on them
+  - Contribution of top 10  most unfluential individual genetic variants to your score
+  - Identified mutations that affect drug toxicity and efficacy
+  - Visualized gennomic regions of the most important mutations
+- **Downloadable Results:** Export results in a PDF report for sharing or future reference.
+
+### 🤖 AI-Based Results Assistant
+
+- **Integrated AI Assistant:** Leverage an AI-powered assistant built into the web app to help interpret your results.
+  - Ask questions about your PRS, what it means, and how to understand the genetic factors involved, key genes, proteins and mutations.
+
+These features make RAdar not only a powerful analytics platform but also an accessible educational tool for users seeking to understand their genetic risk for rheumatoid arthritis.
+
 ## 📊 Repository Structure
 
 This repository contains:
 
 1. **Web application**: A Dash-based web application - frontend/
 2. **RA Polygenic Risk Score Pipeline**: Core analysis pipeline for VCF processing - backend/ and src/
+3. **AI Assistant**: Based on Qwen3
 
 ## ⚠️ Important Disclaimers
 
