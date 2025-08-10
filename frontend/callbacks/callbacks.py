@@ -320,6 +320,23 @@ def register_callbacks(_app):
                 style={'color': '#dc3545'}
             ), True
 
+    # Loading state callback for analyze button
+    @_app.callback(
+        Output('analyze-button', 'children'),
+        Input('analyze-button', 'n_clicks'),
+        prevent_initial_call=True
+    )
+    def update_analyze_button_loading(n_clicks):
+        if n_clicks:
+            return [
+                html.I(className="fas fa-spinner fa-spin", style={'marginRight': '8px'}),
+                'Analyzing... Please wait'
+            ]
+        return [
+            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
+            'Analyze Rheumatoid Arthritis Risk'
+        ]
+
     @_app.callback(
         [Output('risk-results', 'children'),
          Output('variants-section-content', 'children'),
@@ -333,7 +350,8 @@ def register_callbacks(_app):
          Output('top-10-snps-section', 'style'),
          Output('top-10-snps-content', 'children'),
          Output('pdf_report-section', 'style'),
-         Output('user-session', 'data', allow_duplicate=True)],
+         Output('user-session', 'data', allow_duplicate=True),
+         Output('analyze-button', 'children', allow_duplicate=True)],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
          State('upload-genetic-data', 'filename'),
@@ -343,6 +361,12 @@ def register_callbacks(_app):
     def analyze_genetic_risk(n_clicks, contents, filename, user_session):
         if not contents or not user_session:
             raise PreventUpdate
+        
+        # Reset button content after analysis
+        reset_button_content = [
+            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
+            'Analyze Rheumatoid Arthritis Risk'
+        ]
         
         try:
             content_type, content_string = contents.split(',')
@@ -356,7 +380,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             plink_result, error = analyze_rheumatoid_arthritis_risk(decoded, filename, user_session)
             
@@ -366,7 +390,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
@@ -389,7 +413,7 @@ def register_callbacks(_app):
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
+                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
@@ -398,12 +422,12 @@ def register_callbacks(_app):
             visible_style = {**card_style, 'display': 'block'}
             hidden_style = {**card_style, 'display': 'none'}
             sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session
+            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
         
-        return risk_results, variants_section_content, user_balance(balance), visible_style, visible_style, visible_style, snp_dandelion_content, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style, updated_session
+        return risk_results, variants_section_content, user_balance(balance), visible_style, visible_style, visible_style, snp_dandelion_content, visible_style, drug_annotation_content, visible_style, top_10_snps_content, visible_style, updated_session, reset_button_content
 
     @_app.callback(
         Output('prediction-history-table', 'children', allow_duplicate=True),

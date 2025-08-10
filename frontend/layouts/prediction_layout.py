@@ -115,8 +115,16 @@ def genetic_upload_form():
         
         html.Div(id='upload-status', style={'margin': '10px 0'}),
         
-        html.Button('Analyze Rheumatoid Arthritis Risk', id='analyze-button', className='btn-primary', 
-                   style=primary_button_style, disabled=True),
+        html.Button(
+            children=[
+                html.I(className="fas fa-dna", style={'marginRight': '8px'}),
+                'Analyze Rheumatoid Arthritis Risk'
+            ],
+            id='analyze-button', 
+            className='btn-primary', 
+            style=primary_button_style, 
+            disabled=True
+        ),
         
     ], className='card', style=card_style)
 
