@@ -4,7 +4,7 @@
 
 ## What is RAdar?
 
-RAdar helps you understand your genetic predisposition to rheumatoid arthritis by analyzing your DNA data. Simply upload your genetic raw data file (VCF format) from popular direct-to-consumer genetic testing services like 23andMe, AncestryDNA, or MyHeritage, and get a personalized Polygenic Risk Score (PRS).
+RAdar helps you understand your genetic predisposition to rheumatoid arthritis by analyzing your DNA data. Simply upload your genetic raw data file (VCF format) from popular direct-to-consumer genetic testing services like Genotek and get a personalized Polygenic Risk Score (PRS).
 
 ### What is a Polygenic Risk Score?
 A Polygenic Risk Score combines information from multiple genetic variants to estimate your genetic risk for developing rheumatoid arthritis compared to the general population. **Important**: This is for educational purposes only and should not replace professional medical advice.
