@@ -17,6 +17,7 @@ from frontend.ui_kit.styles import table_style, table_header_style, table_cell_s
     dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style, \
     card_style, upload_style
 from frontend.ui_kit.utils import format_timestamp
+from frontend.utils.i18n import t
 
 risk_colors = {
     'low': '#28a745',
@@ -90,15 +91,15 @@ def plot_normal_hist(risk, samples, risk_percentile):
     return histogram_fig
 
 
-def genetic_upload_form():
+def genetic_upload_form(lang: str = 'en'):
     return html.Div([
-        html.H3("Upload Genetic Data", style={'color': '#333', 'marginBottom': '15px'}),
-        html.P("Upload your sequencing data in VCF format", 
+        html.H3(t("upload_genetic_data", lang), style={'color': '#333', 'marginBottom': '15px'}),
+        html.P(t("upload_genetic_data_desc", lang), 
                style={'color': '#666', 'marginBottom': '10px'}),
         
         html.Div([
             html.I(className="fas fa-coins", style={'marginRight': '5px', 'color': '#ffc107'}),
-            html.Span("Cost: 50 credits per analysis", 
+            html.Span(t("cost_per_analysis", lang), 
                      style={'color': '#666', 'fontSize': '14px', 'fontWeight': 'bold'})
         ], style={'marginBottom': '15px', 'padding': '8px', 'backgroundColor': '#fff3cd', 
                  'border': '1px solid #ffeaa7', 'borderRadius': '4px'}),
@@ -107,7 +108,7 @@ def genetic_upload_form():
             id='upload-genetic-data',
             children=html.Div([
                 html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
-                html.Span(id='upload-text', children='Drag and Drop or Click to Select Genetic Data File', style={})
+                html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
             ]),
             style=upload_style,
             multiple=False
@@ -118,7 +119,7 @@ def genetic_upload_form():
         html.Button(
             children=[
                 html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-                'Analyze Rheumatoid Arthritis Risk'
+                t("analyze_ra_risk", lang)
             ],
             id='analyze-button', 
             className='btn-primary', 
@@ -932,54 +933,48 @@ def create_drug_annotation_section(sample):
                    style={'color': '#dc3545', 'fontStyle': 'italic'})
         ])
 
-def prediction_layout(user_session):
+def prediction_layout(user_session, lang: str = 'en'):
     balance = fetch_user_balance(user_session)
     predictions = fetch_prediction_history(user_session)
     
     return html.Div([
-        html.H1("Rheumatoid Arthritis Polygenic Risk Score Prediction", 
+        html.H1(t("prediction_title", lang), 
                 style={'textAlign': 'center', 'color': '#333', 'marginBottom': '30px'}),
         
         html.Div(user_balance(balance), id='current-balance-predictions'),
         
-        genetic_upload_form(),
+        genetic_upload_form(lang),
         
         html.Div([
-            html.H3("Your Polygenic Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("risk_assessment_results", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
         ], className='card', style={**card_style, 'display': 'none'}, id='results-section'),
         
         html.Div([
-            html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("prs_effect_weights", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='variants-section-content')  
         ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
 
         html.Div([
-            html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("genomic_regions", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
         ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
 
         html.Div([
-            html.H3("Mutations Responsible For Drug Efficacy and Toxicity", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("drug_efficacy", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='drug-annotation-content')
         ], className='card', style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
 
         html.Div([
-            html.H3("Top 10 Most Influential SNPs", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("top_10_snps", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='top-10-snps-content')
         ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
 
-         html.Div([
-            html.H3("Visualizations of genomic regions containing SNPs", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
-        ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
-
-
         html.Div([
-            html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('Download PDF Report', id='download-pdf-button', className='btn-primary', 
+            html.H3(t("pdf_report", lang), style={'color': '#333', 'marginBottom': '15px'}),
+            html.Button(t("download_pdf_report", lang), id='download-pdf-button', className='btn-primary', 
             style=primary_button_style, disabled=True),
             dcc.Download(id='download-component')
         ], className='card', style={**card_style, 'display': 'none'}, id='pdf_report-section')

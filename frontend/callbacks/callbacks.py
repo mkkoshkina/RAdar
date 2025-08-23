@@ -1,4 +1,4 @@
-import json
+import json 
 import os
 import base64
 import math
@@ -48,7 +48,7 @@ def register_callbacks(_app):
         State('user-session', 'data')
     )
     def manage_session(sign_in_data, sign_up_data,
-                       current_session):
+                    current_session):
         ctx = callback_context
 
         if not ctx.triggered:
@@ -63,9 +63,30 @@ def register_callbacks(_app):
         return current_session
 
     @_app.callback(
+        Output('language-store', 'data'),
+        [Input('lang-en', 'n_clicks'),
+        Input('lang-ru', 'n_clicks')],
+        State('language-store', 'data'),
+        prevent_initial_call=True
+    )
+    def switch_language(en_clicks, ru_clicks, current_lang):
+        ctx = callback_context
+        if not ctx.triggered:
+            raise PreventUpdate
+        
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        
+        if button_id == 'lang-en':
+            return 'en'
+        elif button_id == 'lang-ru':
+            return 'ru'
+        
+        return current_lang or 'en'
+
+    @_app.callback(
         Output('url', 'pathname'),
         [Input({'type': 'nav-button', 'index': ALL}, 'n_clicks_timestamp'),
-         Input('user-session', 'data')],
+        Input('user-session', 'data')],
         State('url', 'pathname'),
         prevent_initial_call=True
     )
@@ -102,53 +123,94 @@ def register_callbacks(_app):
 
     @_app.callback(
         Output('page-content', 'children'),
-        [Input('url', 'pathname')],
+        [Input('url', 'pathname'),
+        Input('language-store', 'data')],
         [State('user-session', 'data')]
     )
-    def manage_page_content(pathname, user_session):
+    def manage_page_content(pathname, language, user_session):
+        lang = language or 'en'  # Fix: consistent default to English
+        
         if pathname == '/home' or pathname == '/':
-            return home_layout(user_session)
+            return home_layout(user_session, lang=lang)
         
         elif pathname == '/info':
-            return info_layout(user_session)
+            return info_layout(user_session, lang=lang)
         
         elif pathname == '/analyze':
-            # For now, redirect to prediction page or create analyze layout
             if user_session and user_session.get('is_authenticated'):
-                return prediction_layout(user_session)
+                return prediction_layout(user_session, lang=lang)
             else:
                 return dcc.Location(id='url', href='/sign-in', refresh=True)
         
-        elif pathname == '/docs':
-            return "Documentation page will be implemented"
-        
         elif user_session and user_session.get('is_authenticated'):
             if pathname == '/prediction':
-                return prediction_layout(user_session)
+                return prediction_layout(user_session, lang=lang)
             elif pathname == '/billing':
-                return billing_layout(user_session)
+                return billing_layout(user_session, lang=lang)
             elif pathname == '/admin':
                 if user_session.get('is_superuser'):
-                    return admin_layout()
+                    return admin_layout(lang=lang)
                 else:
                     return "403 Access Denied"
             else:
                 return "404 Page Not Found"
         
-        # Non-authenticated user pages
         else:
             if pathname == '/sign-in':
-                return sign_in_layout()
+                return sign_in_layout(lang=lang)
             elif pathname == '/sign-up':
-                return sign_up_layout()
+                return sign_up_layout(lang=lang)
             else:
                 return dcc.Location(id='url', href='/home', refresh=True)
 
     @_app.callback(
-        Output('nav-bar', 'children'),
-        [Input('user-session', 'data')]
+        [Output('lang-en', 'style'),
+        Output('lang-ru', 'style')],
+        Input('language-store', 'data')
     )
-    def manage_navigation_bar(user_session):
+    def update_language_button_styles(current_lang):
+        lang = current_lang or 'en'
+        
+        active_style = {
+            "backgroundColor": "#2563eb",
+            "color": "white",
+            "border": "2px solid #2563eb",
+            "borderRadius": "6px",
+            "padding": "8px 18px",
+            "fontWeight": "600",
+            "fontSize": "1rem",
+            "marginRight": "8px",
+            "boxShadow": "0 2px 8px rgba(37,99,235,0.12)",
+            "cursor": "pointer",
+            "transition": "background 0.2s"
+        }
+        
+        inactive_style = {
+            "backgroundColor": "transparent",
+            "color": "#2563eb",
+            "border": "2px solid #2563eb",
+            "borderRadius": "6px",
+            "padding": "8px 18px",
+            "fontWeight": "600",
+            "fontSize": "1rem",
+            "marginRight": "8px",
+            "boxShadow": "0 2px 8px rgba(37,99,235,0.12)",
+            "cursor": "pointer",
+            "transition": "background 0.2s"
+        }
+        
+        if lang == 'en':
+            return active_style, {**inactive_style, "marginRight": "0"}
+        else:  # lang == 'ru'
+            return {**inactive_style}, {**active_style, "marginRight": "0"}
+        
+    @_app.callback(
+        Output('nav-bar', 'children'),
+        [Input('user-session', 'data'),
+        Input('language-store', 'data')]
+    )
+    def manage_navigation_bar(user_session, language):
+        lang = language or 'en'
         return navigation_bar(user_session)
 
     @_app.callback(
@@ -204,19 +266,21 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('users-report-div', 'children'),
-         Output('predictions-report-div', 'children'),
-         Output('credits-report-div', 'children')],
+        Output('predictions-report-div', 'children'),
+        Output('credits-report-div', 'children')],
         [Input('refresh-button', 'n_clicks')],
-        State('user-session', 'data'),
+        [State('user-session', 'data'),
+        State('language-store', 'data')],
     )
-    def manage_admin_reports(_, user_session):
+    def manage_admin_reports(_, user_session, language):
+        lang = language or 'en'
         try:
             users_report_data = fetch_users_report(user_session=user_session)
             predictions_report_data = fetch_predictions_reports(user_session=user_session)
             credits_report_data = fetch_credits_report(user_session=user_session)
-            return (users_report(users_report_data),
-                    predictions_report(predictions_report_data),
-                    credits_report(credits_report_data))
+            return (users_report(users_report_data, lang),
+                    predictions_report(predictions_report_data, lang),
+                    credits_report(credits_report_data, lang))
         except Exception as e:
             return (error_message("Error fetching users report: " + str(e)),
                     error_message("Error fetching predictions report: " + str(e)),
@@ -234,9 +298,11 @@ def register_callbacks(_app):
         [
             State('user-session', 'data'),
             State('deposit-amount', 'value'),
+            State('language-store', 'data'),
         ]
     )
-    def manage_deposit(deposit_clicks, user_session, _deposit_amount):
+    def manage_deposit(deposit_clicks, user_session, _deposit_amount, language):
+        lang = language or 'en'
         if deposit_clicks > 0 and _deposit_amount and _deposit_amount > 0:
             transaction_info = deposit_amount(_deposit_amount, user_session=user_session)
 
@@ -244,14 +310,14 @@ def register_callbacks(_app):
                 balance = fetch_user_balance(user_session=user_session)
                 transactions = fetch_transaction_history(user_session=user_session)
                 return "", transaction_history_table(
-                    transactions), user_balance(balance)
+                    transactions, lang), user_balance(balance)
 
         raise PreventUpdate
 
     @_app.callback(
         [Output('model-dropdown', 'options'),
-         Output('model-dropdown', 'value'),
-         ],
+        Output('model-dropdown', 'value'),
+        ],
         Input('model-dropdown', 'options'),
         State('user-session', 'data')
     )
@@ -283,24 +349,24 @@ def register_callbacks(_app):
     # Immediate loading state when file is selected
     @_app.callback(
         [Output('upload-icon', 'className', allow_duplicate=True),
-         Output('upload-text', 'children', allow_duplicate=True),
-         Output('upload-text', 'style', allow_duplicate=True)],
+        Output('upload-text', 'children', allow_duplicate=True),
+        Output('upload-text', 'style', allow_duplicate=True)],
         Input('upload-genetic-data', 'contents'),
         prevent_initial_call=True
     )
     def show_immediate_loading(contents):
         if contents is not None:
             return ("fas fa-spinner fa-spin", 
-                   "Processing file, please wait...", 
-                   {'color': '#2563eb', 'fontWeight': '600'})
+                "Processing file, please wait...", 
+                {'color': '#2563eb', 'fontWeight': '600'})
         raise PreventUpdate
 
     @_app.callback(
         [Output('upload-status', 'children'),
-         Output('analyze-button', 'disabled'),
-         Output('upload-icon', 'className'),
-         Output('upload-text', 'children'),
-         Output('upload-text', 'style')],
+        Output('analyze-button', 'disabled'),
+        Output('upload-icon', 'className'),
+        Output('upload-text', 'children'),
+        Output('upload-text', 'style')],
         Input('upload-genetic-data', 'contents'),
         State('upload-genetic-data', 'filename')
     )
@@ -333,8 +399,8 @@ def register_callbacks(_app):
                 {'color': '#059669', 'fontWeight': '600'})
             
             return (dcc.Markdown(f"✅ **File uploaded:** {filename}", style={'color': '#28a745'}), 
-                   False, "fas fa-check-circle", f"Ready to analyze {filename}",
-                   {'color': '#059669', 'fontWeight': '600'})
+                False, "fas fa-check-circle", f"Ready to analyze {filename}",
+                {'color': '#059669', 'fontWeight': '600'})
             
         except Exception as e:
             return (dcc.Markdown(
@@ -362,23 +428,23 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('risk-results', 'children'),
-         Output('variants-section-content', 'children'),
-         Output('current-balance-predictions', 'children', allow_duplicate=True),
-         Output('results-section', 'style'),
-         Output('variants-section', 'style'),
-         Output('snp_dandelion-section', 'style'),
-         Output('snp_dandelion-plot', 'children'),
-         Output('drug-annotation-section', 'style'),
-         Output('drug-annotation-content', 'children'),
-         Output('top-10-snps-section', 'style'),
-         Output('top-10-snps-content', 'children'),
-         Output('pdf_report-section', 'style'),
-         Output('user-session', 'data', allow_duplicate=True),
-         Output('analyze-button', 'children', allow_duplicate=True)],
+        Output('variants-section-content', 'children'),
+        Output('current-balance-predictions', 'children', allow_duplicate=True),
+        Output('results-section', 'style'),
+        Output('variants-section', 'style'),
+        Output('snp_dandelion-section', 'style'),
+        Output('snp_dandelion-plot', 'children'),
+        Output('drug-annotation-section', 'style'),
+        Output('drug-annotation-content', 'children'),
+        Output('top-10-snps-section', 'style'),
+        Output('top-10-snps-content', 'children'),
+        Output('pdf_report-section', 'style'),
+        Output('user-session', 'data', allow_duplicate=True),
+        Output('analyze-button', 'children', allow_duplicate=True)],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
-         State('upload-genetic-data', 'filename'),
-         State('user-session', 'data')],
+        State('upload-genetic-data', 'filename'),
+        State('user-session', 'data')],
         prevent_initial_call=True
     )
     def analyze_genetic_risk(n_clicks, contents, filename, user_session):
@@ -464,8 +530,8 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('upload-genetic-data', 'children', allow_duplicate=True),
-         Output('upload-status', 'children', allow_duplicate=True),
-         Output('analyze-button', 'disabled', allow_duplicate=True)],
+        Output('upload-status', 'children', allow_duplicate=True),
+        Output('analyze-button', 'disabled', allow_duplicate=True)],
         Input('error-try-again-button', 'n_clicks'),
         prevent_initial_call=True
     )

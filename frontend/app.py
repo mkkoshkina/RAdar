@@ -11,10 +11,9 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dcc.Interval(id='interval-component', interval=5 * 60 * 1000),
     dcc.Store(id='user-session', storage_type='session'),
-
     dcc.Store(id='sign-in-session-update', storage_type='session'),
     dcc.Store(id='sign-up-session-update', storage_type='session'),
-
+    dcc.Store(id='language-store', data='en', storage_type='session'),
     html.Div(id='nav-bar'),
     html.Div(id='page-content', style=page_content_style),
     html.Button(
@@ -37,7 +36,6 @@ app.layout = html.Div([
         }
     ),
     dcc.Store(id='chat-popup-visible', data=False),  # Add this to store popup state
-
     chat_popup(),
 ])
 
@@ -143,4 +141,4 @@ app.index_string = '''
 
 if __name__ == '__main__':
     register_callbacks(app)
-    app.run(debug=False, host='0.0.0.0', port=9000)
+    app.run(debug=True, host='0.0.0.0', port=9000)
