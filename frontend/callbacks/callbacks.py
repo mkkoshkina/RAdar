@@ -29,6 +29,7 @@ from frontend.ui_kit.components.navigation import navigation_bar
 from frontend.ui_kit.components.user_balance import user_balance
 
 from frontend.data.remote_data import send_chat_message
+from frontend.utils.i18n import t
 import uuid
 
 
@@ -352,12 +353,14 @@ def register_callbacks(_app):
         Output('upload-text', 'children', allow_duplicate=True),
         Output('upload-text', 'style', allow_duplicate=True)],
         Input('upload-genetic-data', 'contents'),
+        State('language-store', 'data'),
         prevent_initial_call=True
     )
-    def show_immediate_loading(contents):
+    def show_immediate_loading(contents, language):
         if contents is not None:
+            lang = language or 'en'
             return ("fas fa-spinner fa-spin", 
-                "Processing file, please wait...", 
+                t("processing_file", lang), 
                 {'color': '#2563eb', 'fontWeight': '600'})
         raise PreventUpdate
 
@@ -368,11 +371,13 @@ def register_callbacks(_app):
         Output('upload-text', 'children'),
         Output('upload-text', 'style')],
         Input('upload-genetic-data', 'contents'),
-        State('upload-genetic-data', 'filename')
+        [State('upload-genetic-data', 'filename'),
+        State('language-store', 'data')]
     )
-    def update_upload_status(contents, filename):
+    def update_upload_status(contents, filename, language):
+        lang = language or 'en'
         if contents is None:
-            return "", True, "fas fa-upload", "Drag and Drop or Click to Select Genetic Data File", {}
+            return "", True, "fas fa-upload", t("drag_and_drop", lang), {}
         
         try:
             # Show loading state immediately while processing
@@ -386,7 +391,7 @@ def register_callbacks(_app):
                 return (dcc.Markdown(
                     f"❌ **File validation failed:**\\n{error_list}", 
                     style={'color': '#dc3545'}
-                ), True, "fas fa-exclamation-triangle", "Upload failed - please try again", 
+                ), True, "fas fa-exclamation-triangle", t("upload_failed", lang), 
                 {'color': '#dc2626', 'fontWeight': '600'})
             
             file_size_mb = len(decoded) / (1024 * 1024)
@@ -395,35 +400,37 @@ def register_callbacks(_app):
                     f"⚠️ **Large file uploaded:** {filename} ({file_size_mb:.1f} MB)\\n"
                     f"Analysis may take several minutes to complete.", 
                     style={'color': '#ffc107'}
-                ), False, "fas fa-check-circle", f"Ready to analyze {filename}",
+                ), False, "fas fa-check-circle", f"{t('ready_to_analyze', lang)} {filename}",
                 {'color': '#059669', 'fontWeight': '600'})
             
-            return (dcc.Markdown(f"✅ **File uploaded:** {filename}", style={'color': '#28a745'}), 
-                False, "fas fa-check-circle", f"Ready to analyze {filename}",
+            return (dcc.Markdown(f"✅ **{t('file_uploaded', lang)}** {filename}", style={'color': '#28a745'}), 
+                False, "fas fa-check-circle", f"{t('ready_to_analyze', lang)} {filename}",
                 {'color': '#059669', 'fontWeight': '600'})
             
         except Exception as e:
             return (dcc.Markdown(
                 f"❌ **Error reading file:** {str(e)}", 
                 style={'color': '#dc3545'}
-            ), True, "fas fa-exclamation-triangle", "Upload failed - please try again",
+            ), True, "fas fa-exclamation-triangle", t("upload_failed", lang),
             {'color': '#dc2626', 'fontWeight': '600'})
 
     # Loading state callback for analyze button
     @_app.callback(
         Output('analyze-button', 'children'),
         Input('analyze-button', 'n_clicks'),
+        State('language-store', 'data'),
         prevent_initial_call=True
     )
-    def update_analyze_button_loading(n_clicks):
+    def update_analyze_button_loading(n_clicks, language):
+        lang = language or 'en'
         if n_clicks:
             return [
                 html.I(className="fas fa-spinner fa-spin", style={'marginRight': '8px'}),
-                'Analyzing... Please wait'
+                t("processing_file", lang)
             ]
         return [
             html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-            'Analyze Rheumatoid Arthritis Risk'
+            t("analyze_button_text", lang)
         ]
 
     @_app.callback(
@@ -444,17 +451,20 @@ def register_callbacks(_app):
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
         State('upload-genetic-data', 'filename'),
-        State('user-session', 'data')],
+        State('user-session', 'data'),
+        State('language-store', 'data')],
         prevent_initial_call=True
     )
-    def analyze_genetic_risk(n_clicks, contents, filename, user_session):
+    def analyze_genetic_risk(n_clicks, contents, filename, user_session, language):
         if not contents or not user_session:
             raise PreventUpdate
+        
+        lang = language or 'en'
         
         # Reset button content after analysis
         reset_button_content = [
             html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-            'Analyze Rheumatoid Arthritis Risk'
+            t("analyze_button_text", lang)
         ]
         
         try:
@@ -464,32 +474,32 @@ def register_callbacks(_app):
             validation_errors = validate_vcf_file(filename, decoded)
             if validation_errors:
                 error_msg = f"File validation failed: {'; '.join(validation_errors)}"
-                risk_results = create_risk_results(error_message=error_msg)
+                risk_results = create_risk_results(error_message=error_msg, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             plink_result, error = analyze_rheumatoid_arthritis_risk(decoded, filename, user_session)
             
             if error:
-                risk_results = create_risk_results(error_message=error)
+                risk_results = create_risk_results(error_message=error, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
-                risk_results = create_risk_results(plink_data)
+                risk_results = create_risk_results(plink_data, lang=lang)
                 
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                drug_annotation_content = create_drug_annotation_section(sample_name)
-                top_10_snps_content = create_top_10_snps_section(sample_name)
-                variants_section_content = create_variants_section(sample_name)
-                snp_dandelion_content = snp_dandelion_plot(sample_name)
+                drug_annotation_content = create_drug_annotation_section(sample_name, lang)
+                top_10_snps_content = create_top_10_snps_section(sample_name, lang)
+                variants_section_content = create_variants_section(sample_name, lang)
+                snp_dandelion_content = snp_dandelion_plot(sample_name, lang)
                 
                 # Store prediction data in session for PDF generation
                 updated_session = user_session.copy()
@@ -497,21 +507,21 @@ def register_callbacks(_app):
                 updated_session['latest_plink_data'] = plink_data
             else:
                 error_msg = plink_result.get('error', 'Unknown error')
-                risk_results = create_risk_results(error_message=error_msg)
+                risk_results = create_risk_results(error_message=error_msg, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
-            risk_results = create_risk_results(error_message=error_msg)
+            risk_results = create_risk_results(error_message=error_msg, lang=lang)
             balance = fetch_user_balance(user_session=user_session)
             visible_style = {**card_style, 'display': 'block'}
             hidden_style = {**card_style, 'display': 'none'}
             sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+            return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
@@ -533,14 +543,16 @@ def register_callbacks(_app):
         Output('upload-status', 'children', allow_duplicate=True),
         Output('analyze-button', 'disabled', allow_duplicate=True)],
         Input('error-try-again-button', 'n_clicks'),
+        State('language-store', 'data'),
         prevent_initial_call=True
     )
-    def reset_upload_on_error(n_clicks):
+    def reset_upload_on_error(n_clicks, language):
         if n_clicks:
+            lang = language or 'en'
             return (
                 html.Div([
                     html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
-                    html.Span(id='upload-text', children='Drag and Drop or Click to Select Genetic Data File', style={})
+                    html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
                 ]),
                 "",
                 True

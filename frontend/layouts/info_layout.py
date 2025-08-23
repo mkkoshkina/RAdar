@@ -194,20 +194,20 @@ def info_layout(user_session=None, lang: str = 'en'):
                 html.Span("🟢", style={'marginRight': '10px', 'fontSize': '1.5rem'}),
                 t("low_genetic_risk", lang)
             ], style=section_header_style),
-            html.P("Your genetic predisposition to rheumatoid arthritis is lower than that of 80% of the population. While this suggests a reduced inherited susceptibility, environmental and lifestyle factors still play an important role in overall disease risk. Standard health monitoring and preventive care remain appropriate to maintain long-term joint and general health.", 
+            html.P(t("low_risk_description", lang), 
                    style={**text_style, 'marginBottom': '20px', 'fontSize': '1.05rem'}),
             
             html.Div([
                 html.H4("👨‍⚕️ " + t("for_healthcare_providers", lang), style={'color': '#10b981', 'marginBottom': '10px'}),
-                html.P("Standard age-appropriate medical surveillance should be maintained, with documentation of the patient's PGS status in their medical records. It is important to monitor for symptom development over time and to apply the usual rheumatoid arthritis clinical assessment if symptoms appear.", 
+                html.P(t("low_risk_providers", lang), 
                        style=text_style)
             ], style=subsection_style),
             
             html.Div([
                 html.H4("👤 " + t("for_patients", lang), style={'color': '#10b981', 'marginBottom': '10px'}),
-                html.P("Lifestyle management is a key component. Complete smoking cessation remains the most important modifiable risk factor. Maintaining a healthy weight within a BMI range of 18.5–24.9 is recommended, alongside regular dental care and treatment of any periodontal disease. A balanced diet rich in omega-3 fatty acids can help support overall health and potentially reduce inflammation.", 
+                html.P(t("low_risk_patients_1", lang), 
                        style=text_style),
-                html.P("Patients should remain aware of potential early symptoms of RA, such as morning joint stiffness lasting more than 30 minutes, symmetric pain or swelling in the hands or feet, and joint symptoms that persist for more than six weeks. If these symptoms develop, they should promptly contact their healthcare provider. Routine follow-up through standard preventive care visits is advised to ensure timely detection and intervention if needed.", 
+                html.P(t("low_risk_patients_2", lang), 
                        style=text_style)
             ], style=subsection_style)
         ], style=low_risk_style),
@@ -218,18 +218,18 @@ def info_layout(user_session=None, lang: str = 'en'):
                 html.Span("🟡", style={'marginRight': '10px', 'fontSize': '1.5rem'}),
                 t("moderate_genetic_risk", lang)
             ], style=section_header_style),
-            html.P("Your genetic risk is within the typical population range, meaning your genetic predisposition is similar to that of most people. Nonetheless, enhanced prevention strategies can be beneficial, and closer attention to early symptoms is warranted.", 
+            html.P(t("moderate_risk_description", lang), 
                    style={**text_style, 'marginBottom': '20px', 'fontSize': '1.05rem'}),
             
             html.Div([
                 html.H4("👨‍⚕️ " + t("for_healthcare_providers", lang), style={'color': '#f59e0b', 'marginBottom': '10px'}),
-                html.P("Management should include clinical monitoring with a detailed family history assessment and baseline serological testing (RF, anti-CCP, CRP) if symptoms develop. If joint symptoms are present, the EULAR/ACR arthralgia risk criteria should be applied, and rheumatology referral considered for persistent arthralgia lasting more than six weeks. Documentation is important: record the patient's PGS status, note modifiable risk factors, and establish a clear symptom monitoring protocol.", 
+                html.P(t("moderate_risk_providers", lang), 
                        style=text_style)
             ], style=subsection_style),
             
             html.Div([
                 html.H4("👤 " + t("for_patients", lang), style={'color': '#f59e0b', 'marginBottom': '10px'}),
-                html.P("Enhanced prevention is key. Complete smoking cessation, ideally with professional support, is critical. Maintaining a BMI below 25, receiving professional periodontal care every six months, practicing stress management techniques, and following an anti-inflammatory Mediterranean-style diet can help reduce risk. Patients should actively monitor symptoms, keeping a diary if joint issues arise, and seek prompt evaluation for morning stiffness lasting more than 45 minutes or for any joint swelling or symmetric pain. Annual wellness visits should include discussion of joint health.", 
+                html.P(t("moderate_risk_patients", lang), 
                        style=text_style)
             ], style=subsection_style)
         ], style=moderate_risk_style),
@@ -240,18 +240,18 @@ def info_layout(user_session=None, lang: str = 'en'):
                 html.Span("🔴", style={'marginRight': '10px', 'fontSize': '1.5rem'}),
                 t("high_genetic_risk", lang)
             ], style=section_header_style),
-            html.P("Your genetic risk is significantly above average, meaning your genetic predisposition to rheumatoid arthritis is higher than that of 80% of the population. This level of risk warrants intensive prevention and close monitoring strategies, as early intervention can help prevent or delay disease onset. It is important to note that most people with a high genetic risk still never develop rheumatoid arthritis.", 
+            html.P(t("high_risk_description", lang), 
                    style={**text_style, 'marginBottom': '20px', 'fontSize': '1.05rem'}),
             
             html.Div([
                 html.H4("👨‍⚕️ " + t("for_healthcare_providers", lang), style={'color': '#ef4444', 'marginBottom': '10px'}),
-                html.P("Specialized monitoring is recommended, including a rheumatology consultation within six months, a baseline comprehensive assessment with joint examination, and baseline serological testing (anti-CCP, RF, CRP, ESR). If symptoms are present, consider ultrasound, MRI evaluation and develop an individualized monitoring schedule. Maintain clinical vigilance with urgent evaluation for any joint symptoms lasting longer than two weeks, a low threshold for rheumatology referral, and application of EULAR/ACR arthralgia risk stratification criteria. Participation in research initiatives such as the STOP-RA or PRAIRI studies may also be considered. Documentation should include a comprehensive risk factor assessment, a clear monitoring and escalation plan, and records of patient education.", 
+                html.P(t("high_risk_providers", lang), 
                        style=text_style)
             ], style=subsection_style),
             
             html.Div([
                 html.H4("👤 " + t("for_patients", lang), style={'color': '#ef4444', 'marginBottom': '10px'}),
-                html.P("Maximum risk reduction is essential. Complete smoking cessation with medical support is a top priority. Additional preventive measures include professional nutrition consultation for weight management, comprehensive periodontal care, stress management (with professional counseling if needed), and participation in joint-protective physical activity programs. Patients should maintain heightened symptom awareness and seek immediate medical attention for morning stiffness lasting more than one hour, any joint swelling, symmetric joint pain, difficulty making a fist, or fatigue associated with joint symptoms.", 
+                html.P(t("high_risk_patients", lang), 
                        style=text_style)
             ], style=subsection_style)
         ], style=high_risk_style),
@@ -263,11 +263,11 @@ def info_layout(user_session=None, lang: str = 'en'):
                 t("key_takeaways", lang)
             ], style={'fontSize': '1.8rem', 'fontWeight': '600', 'marginBottom': '20px', 'color': theme_colors['text']}),
             html.Ul([
-                html.Li("Your genetic risk is one piece of the puzzle — lifestyle and environmental factors are equally important", style={'marginBottom': '8px'}),
-                html.Li("Prevention works — smoking cessation and lifestyle modification can significantly reduce risk regardless of genetics", style={'marginBottom': '8px'}),
-                html.Li("Early detection saves joints — prompt evaluation of symptoms leads to better outcomes", style={'marginBottom': '8px'}),
-                html.Li("You have control — many factors influencing RA development are modifiable", style={'marginBottom': '8px'}),
-                html.Li("Stay informed — RA prevention and treatment continue to improve", style={'marginBottom': '8px'})
+                html.Li(t("key_takeaway_1", lang), style={'marginBottom': '8px'}),
+                html.Li(t("key_takeaway_2", lang), style={'marginBottom': '8px'}),
+                html.Li(t("key_takeaway_3", lang), style={'marginBottom': '8px'}),
+                html.Li(t("key_takeaway_4", lang), style={'marginBottom': '8px'}),
+                html.Li(t("key_takeaway_5", lang), style={'marginBottom': '8px'})
             ], style={'fontSize': '1.1rem', 'lineHeight': '1.6', 'color': theme_colors['text']}),
             html.P([
                 html.Strong(t("remember", lang) + " "),

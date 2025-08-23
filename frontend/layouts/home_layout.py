@@ -60,39 +60,39 @@ btn_row_style = {
 }
 
 
-def _markdown_content(app_name: str) -> str:
+def _markdown_content(app_name: str, lang: str = 'en') -> str:
     return f"""
-**🧬 {app_name} – Genetic Risk Calculator for Rheumatoid Arthritis**
+**🧬 {app_name} – {t("tool_description_title", lang)}**
 
-{app_name} is a clinical decision-support tool designed to assess an individual’s polygenic risk for developing rheumatoid arthritis (RA), using validated Polygenic Risk Scores (PRS).
+{app_name} {t("tool_description", lang)}
 
-By uploading a patient’s genetic data file in VCF, the platform cross-references known single nucleotide polymorphisms (SNPs) associated with RA risk against curated scientific databases. The resulting PRS can be integrated into the broader context of clinical evaluation, supporting risk stratification, early intervention planning, and personalized prevention strategies.
+{t("tool_description_detail", lang)}
 
 ---
 
-### 📚 Genomic evidence sources
-[PGS Catalog PGS000195](https://www.pgscatalog.org/score/PGS000195/), [PGS Catalog PGS000194](https://www.pgscatalog.org/score/PGS000194/), and peer-reviewed RA-specific literature. These datasets encompass both general genetic susceptibility loci and variants linked to seropositive and seronegative RA phenotypes.
+### 📚 {t("genomic_evidence_sources", lang)}
+[PGS Catalog PGS000195](https://www.pgscatalog.org/score/PGS000195/), [PGS Catalog PGS000194](https://www.pgscatalog.org/score/PGS000194/), {t("genomic_evidence_detail", lang)}
 
-### ⚖️ Clinical relevance
-Polygenic risk models have demonstrated utility in multiple specialties — cardiology, oncology, endocrinology — and are now being translated into rheumatology. Potential applications in RA include:
+### ⚖️ {t("clinical_relevance", lang)}
+{t("clinical_relevance_intro", lang)}
 
-- Identifying high-risk individuals before symptom onset, enabling targeted monitoring;
-- Guiding lifestyle or pharmacologic prevention strategies in predisposed patients;
-- Refining patient selection for clinical trials focused on disease modification;
-- Complementing traditional biomarkers (e.g., ACCP, RF) in risk assessment.
+- {t("clinical_app_1", lang)}
+- {t("clinical_app_2", lang)}
+- {t("clinical_app_3", lang)}
+- {t("clinical_app_4", lang)}
 
-### ⚠️ Important
-The PRS is an adjunctive tool, not a diagnostic test. It should be interpreted in the context of the patient’s clinical picture, family history, and other biomarkers. It does not replace physician judgment and is not intended as a standalone determinant for treatment initiation.
+### ⚠️ {t("important_notice", lang)}
+{t("important_disclaimer", lang)}
 
-### 🛡 Data protection
-- All files are processed locally or on encrypted, secure servers.
-- No genetic data is stored after analysis — automatic deletion is enforced.
+### 🛡 {t("data_protection", lang)}
+- {t("data_protection_1", lang)}
+- {t("data_protection_2", lang)}
 
-### 📄 Supported data formats
-- VCF — MyHeritage, Ancestry, Atlas, WES/WGS
+### 📄 {t("supported_data_formats", lang)}
+- {t("supported_formats_detail", lang)}
 
-### 🔹 Clinical use case
-**RAdar** can be incorporated into preventive rheumatology workflows as part of risk-based patient management, supporting earlier detection, improved counseling, and proactive care pathways.
+### 🔹 {t("clinical_use_case", lang)}
+**{app_name}** {t("clinical_use_case_detail", lang)}
 """
 
 
@@ -191,7 +191,7 @@ def info_cards(app_name: str, lang: str = 'en'):
     return html.Div([
         html.Div([
             html.Div(t("about_tool", lang), style=heading_style),
-            dcc.Markdown(_markdown_content(app_name), style=text_style),
+            dcc.Markdown(_markdown_content(app_name, lang), style=text_style),
         ], style=card_style),
         html.Div([
             html.Div(t("how_it_works", lang), style=heading_style),
