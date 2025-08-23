@@ -204,5 +204,15 @@
   "average": "average",
   "higher_than_average": "higher than average",
   "low": "low",
-  "high": "high"
+  "high": "high",
+  
+  "upload_vcf_file": "Upload VCF File",
+  "back_to_home": "Back to Home",
+  
+  "upload_cta": "Upload VCF and Analyze",
+  "view_info": "View Information",
+  
+  "key_takeaways": "Key Takeaways",
+  "remember": "Important:",
+  "remember_text": "Your genetic risk is probability-based, not predictive. Even high genetic risk does not mean you will definitely develop rheumatoid arthritis, and low risk does not guarantee you won't."
 }

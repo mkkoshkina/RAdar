@@ -107,7 +107,7 @@ def genetic_upload_form(lang: str = 'en'):
         dcc.Upload(
             id='upload-genetic-data',
             children=html.Div([
-                html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
+                html.Span(id='upload-icon', children="📁", style={'marginRight': '10px', 'fontSize': '16px'}),
                 html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
             ]),
             style=upload_style,
@@ -118,8 +118,8 @@ def genetic_upload_form(lang: str = 'en'):
         
         html.Button(
             children=[
-                html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-                t("analyze_ra_risk", lang)
+                html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
+                t("analyze_button_text", lang)
             ],
             id='analyze-button', 
             className='btn-primary', 

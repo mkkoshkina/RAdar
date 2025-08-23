@@ -49,7 +49,22 @@ app.index_string = '''
         {%favicon%}
         {%css%}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
         <style>
+            /* Ensure Font Awesome icons are visible */
+            .fas, .fa {
+                font-family: "Font Awesome 6 Free" !important;
+                font-weight: 900 !important;
+                display: inline-block !important;
+            }
+            
+            /* Specific icon fixes */
+            .fa-upload::before { content: "\f093" !important; }
+            .fa-dna::before { content: "\f471" !important; }
+            .fa-info-circle::before { content: "\f05a" !important; }
+            .fa-home::before { content: "\f015" !important; }
+            .fa-key::before { content: "\f084" !important; }
+            
             /* Chat button hover effects */
             #open-chat-popup:hover {
                 background: #0056b3 !important;

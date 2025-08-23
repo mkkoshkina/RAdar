@@ -359,8 +359,8 @@ def register_callbacks(_app):
     def show_immediate_loading(contents, language):
         if contents is not None:
             lang = language or 'en'
-            return ("fas fa-spinner fa-spin", 
-                t("processing_file", lang), 
+            return ("", 
+                "⏳ " + t("processing_file", lang), 
                 {'color': '#2563eb', 'fontWeight': '600'})
         raise PreventUpdate
 
@@ -377,7 +377,7 @@ def register_callbacks(_app):
     def update_upload_status(contents, filename, language):
         lang = language or 'en'
         if contents is None:
-            return "", True, "fas fa-upload", t("drag_and_drop", lang), {}
+            return "", True, "", "📁 " + t("drag_and_drop", lang), {}
         
         try:
             # Show loading state immediately while processing
@@ -391,7 +391,7 @@ def register_callbacks(_app):
                 return (dcc.Markdown(
                     f"❌ **File validation failed:**\\n{error_list}", 
                     style={'color': '#dc3545'}
-                ), True, "fas fa-exclamation-triangle", t("upload_failed", lang), 
+                ), True, "", "❌ " + t("upload_failed", lang), 
                 {'color': '#dc2626', 'fontWeight': '600'})
             
             file_size_mb = len(decoded) / (1024 * 1024)
@@ -400,18 +400,18 @@ def register_callbacks(_app):
                     f"⚠️ **Large file uploaded:** {filename} ({file_size_mb:.1f} MB)\\n"
                     f"Analysis may take several minutes to complete.", 
                     style={'color': '#ffc107'}
-                ), False, "fas fa-check-circle", f"{t('ready_to_analyze', lang)} {filename}",
+                ), False, "", f"✅ {t('ready_to_analyze', lang)} {filename}",
                 {'color': '#059669', 'fontWeight': '600'})
             
             return (dcc.Markdown(f"✅ **{t('file_uploaded', lang)}** {filename}", style={'color': '#28a745'}), 
-                False, "fas fa-check-circle", f"{t('ready_to_analyze', lang)} {filename}",
+                False, "", f"✅ {t('ready_to_analyze', lang)} {filename}",
                 {'color': '#059669', 'fontWeight': '600'})
             
         except Exception as e:
             return (dcc.Markdown(
                 f"❌ **Error reading file:** {str(e)}", 
                 style={'color': '#dc3545'}
-            ), True, "fas fa-exclamation-triangle", t("upload_failed", lang),
+            ), True, "", "❌ " + t("upload_failed", lang),
             {'color': '#dc2626', 'fontWeight': '600'})
 
     # Loading state callback for analyze button
@@ -425,11 +425,11 @@ def register_callbacks(_app):
         lang = language or 'en'
         if n_clicks:
             return [
-                html.I(className="fas fa-spinner fa-spin", style={'marginRight': '8px'}),
+                html.Span("⏳", style={'marginRight': '8px', 'fontSize': '16px'}),
                 t("processing_file", lang)
             ]
         return [
-            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
+            html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
             t("analyze_button_text", lang)
         ]
 
@@ -463,7 +463,7 @@ def register_callbacks(_app):
         
         # Reset button content after analysis
         reset_button_content = [
-            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
+            html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
             t("analyze_button_text", lang)
         ]
         
@@ -551,7 +551,7 @@ def register_callbacks(_app):
             lang = language or 'en'
             return (
                 html.Div([
-                    html.I(id='upload-icon', className="fas fa-upload", style={'marginRight': '10px'}),
+                    html.Span(id='upload-icon', children="📁", style={'marginRight': '10px', 'fontSize': '16px'}),
                     html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
                 ]),
                 "",

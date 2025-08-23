@@ -142,7 +142,7 @@ def hero_section(app_name: str, lang: str = 'en'):
             [
                 dcc.Link(
                     html.Button([
-                        html.I(className="fas fa-upload", style={'marginRight': '10px'}),
+                        html.Span("📁", style={'marginRight': '10px', 'fontSize': '16px'}),
                         t("upload_cta", lang)
                     ], id="home-upload-cta", n_clicks=0,
                        className='btn-primary', style={
@@ -161,7 +161,7 @@ def hero_section(app_name: str, lang: str = 'en'):
                 ),
                 dcc.Link(
                     html.Button([
-                        html.I(className="fas fa-info-circle", style={'marginRight': '10px'}),
+                        html.Span("ℹ️", style={'marginRight': '10px', 'fontSize': '16px'}),
                         t("view_info", lang)
                     ], id="home-docs-cta", n_clicks=0, 
                        className='btn-primary', style={

@@ -138,7 +138,7 @@ def info_layout(user_session=None, lang: str = 'en'):
             html.Div([
                 html.A(
                     html.Button([
-                        html.I(className="fas fa-upload", style={'marginRight': '8px'}),
+                        html.Span("📁", style={'marginRight': '8px', 'fontSize': '16px'}),
                         t("upload_vcf_file", lang)
                     ], className='btn-primary', style={
                         **primary_button_style, 
@@ -154,7 +154,7 @@ def info_layout(user_session=None, lang: str = 'en'):
                 ),
                 html.A(
                     html.Button([
-                        html.I(className="fas fa-home", style={'marginRight': '8px'}),
+                        html.Span("🏠", style={'marginRight': '8px', 'fontSize': '16px'}),
                         t("back_to_home", lang)
                     ], className='btn-secondary', style={
                         **secondary_button_style,
