@@ -3,15 +3,16 @@ from dash.dash_table.Format import Format, Group
 
 from frontend.ui_kit.styles import table_style, table_header_style, table_cell_style, secondary_button_style, \
     text_style
+from frontend.utils.i18n import t
 
 
 # Components
-def users_report(data):
+def users_report(data, lang: str = 'en'):
     if not data:
-        return html.Div("No information about users", style=text_style)
+        return html.Div(t("no_users_info", lang), style=text_style)
 
     columns = [
-        {'name': 'Active Users', 'id': 'active_users', 'type': 'numeric'},
+        {'name': t('active_users', lang), 'id': 'active_users', 'type': 'numeric'},
     ]
 
     data_array = [data]
@@ -20,13 +21,13 @@ def users_report(data):
                                 style_header=table_header_style)
 
 
-def predictions_report(data):
+def predictions_report(data, lang: str = 'en'):
     if not data:
-        return html.Div("No information about predictions", style=text_style)
+        return html.Div(t("no_predictions_info", lang), style=text_style)
 
     columns = [
-        {'name': 'Model Name', 'id': 'model_name'},
-        {'name': 'Total Predictions', 'id': 'total_prediction_batches', 'type': 'numeric',
+        {'name': t('model_name', lang), 'id': 'model_name'},
+        {'name': t('total_predictions', lang), 'id': 'total_prediction_batches', 'type': 'numeric',
          'format': Format(group=Group.yes)}
     ]
     return dash_table.DataTable(columns=columns, data=data, style_table=table_style,
@@ -34,13 +35,13 @@ def predictions_report(data):
                                 style_header=table_header_style)
 
 
-def credits_report(data):
+def credits_report(data, lang: str = 'en'):
     if not data:
-        return html.Div("No information about credits", style=text_style)
+        return html.Div(t("no_credits_info", lang), style=text_style)
 
     columns = [
-        {'name': 'Total Credits Purchased', 'id': 'total_credits_purchased', 'type': 'numeric'},
-        {'name': 'Total Credits Spent', 'id': 'total_credits_spent', 'type': 'numeric'}
+        {'name': t('total_credits_purchased', lang), 'id': 'total_credits_purchased', 'type': 'numeric'},
+        {'name': t('total_credits_spent', lang), 'id': 'total_credits_spent', 'type': 'numeric'}
     ]
 
     data_array = [data]
@@ -50,11 +51,11 @@ def credits_report(data):
 
 
 # Layout
-def admin_layout():
+def admin_layout(lang: str = 'en'):
     return html.Div(id='admin-page', children=[
-        html.Div(id='users-report-div', children=users_report({})),
-        html.Div(id='predictions-report-div', children=predictions_report([])),
-        html.Div(id='credits-report-div', children=credits_report({})),
-        html.Button("Refresh Data", id="refresh-button", n_clicks=0,
+        html.Div(id='users-report-div', children=users_report({}, lang)),
+        html.Div(id='predictions-report-div', children=predictions_report([], lang)),
+        html.Div(id='credits-report-div', children=credits_report({}, lang)),
+        html.Button(t("refresh_data", lang), id="refresh-button", n_clicks=0,
                     style={**secondary_button_style, 'display': 'block', 'margin': '0 auto', 'marginTop': '20px'}),
     ])

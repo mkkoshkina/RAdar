@@ -1,4 +1,4 @@
-import json
+import json 
 import os
 import base64
 import math
@@ -29,6 +29,7 @@ from frontend.ui_kit.components.navigation import navigation_bar
 from frontend.ui_kit.components.user_balance import user_balance
 
 from frontend.data.remote_data import send_chat_message
+from frontend.utils.i18n import t
 import uuid
 
 
@@ -48,7 +49,7 @@ def register_callbacks(_app):
         State('user-session', 'data')
     )
     def manage_session(sign_in_data, sign_up_data,
-                       current_session):
+                    current_session):
         ctx = callback_context
 
         if not ctx.triggered:
@@ -63,9 +64,30 @@ def register_callbacks(_app):
         return current_session
 
     @_app.callback(
+        Output('language-store', 'data'),
+        [Input('lang-en', 'n_clicks'),
+        Input('lang-ru', 'n_clicks')],
+        State('language-store', 'data'),
+        prevent_initial_call=True
+    )
+    def switch_language(en_clicks, ru_clicks, current_lang):
+        ctx = callback_context
+        if not ctx.triggered:
+            raise PreventUpdate
+        
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        
+        if button_id == 'lang-en':
+            return 'en'
+        elif button_id == 'lang-ru':
+            return 'ru'
+        
+        return current_lang or 'en'
+
+    @_app.callback(
         Output('url', 'pathname'),
         [Input({'type': 'nav-button', 'index': ALL}, 'n_clicks_timestamp'),
-         Input('user-session', 'data')],
+        Input('user-session', 'data')],
         State('url', 'pathname'),
         prevent_initial_call=True
     )
@@ -102,53 +124,94 @@ def register_callbacks(_app):
 
     @_app.callback(
         Output('page-content', 'children'),
-        [Input('url', 'pathname')],
+        [Input('url', 'pathname'),
+        Input('language-store', 'data')],
         [State('user-session', 'data')]
     )
-    def manage_page_content(pathname, user_session):
+    def manage_page_content(pathname, language, user_session):
+        lang = language or 'en'  # Fix: consistent default to English
+        
         if pathname == '/home' or pathname == '/':
-            return home_layout(user_session)
+            return home_layout(user_session, lang=lang)
         
         elif pathname == '/info':
-            return info_layout(user_session)
+            return info_layout(user_session, lang=lang)
         
         elif pathname == '/analyze':
-            # For now, redirect to prediction page or create analyze layout
             if user_session and user_session.get('is_authenticated'):
-                return prediction_layout(user_session)
+                return prediction_layout(user_session, lang=lang)
             else:
                 return dcc.Location(id='url', href='/sign-in', refresh=True)
         
-        elif pathname == '/docs':
-            return "Documentation page will be implemented"
-        
         elif user_session and user_session.get('is_authenticated'):
             if pathname == '/prediction':
-                return prediction_layout(user_session)
+                return prediction_layout(user_session, lang=lang)
             elif pathname == '/billing':
-                return billing_layout(user_session)
+                return billing_layout(user_session, lang=lang)
             elif pathname == '/admin':
                 if user_session.get('is_superuser'):
-                    return admin_layout()
+                    return admin_layout(lang=lang)
                 else:
                     return "403 Access Denied"
             else:
                 return "404 Page Not Found"
         
-        # Non-authenticated user pages
         else:
             if pathname == '/sign-in':
-                return sign_in_layout()
+                return sign_in_layout(lang=lang)
             elif pathname == '/sign-up':
-                return sign_up_layout()
+                return sign_up_layout(lang=lang)
             else:
                 return dcc.Location(id='url', href='/home', refresh=True)
 
     @_app.callback(
-        Output('nav-bar', 'children'),
-        [Input('user-session', 'data')]
+        [Output('lang-en', 'style'),
+        Output('lang-ru', 'style')],
+        Input('language-store', 'data')
     )
-    def manage_navigation_bar(user_session):
+    def update_language_button_styles(current_lang):
+        lang = current_lang or 'en'
+        
+        active_style = {
+            "backgroundColor": "#2563eb",
+            "color": "white",
+            "border": "2px solid #2563eb",
+            "borderRadius": "6px",
+            "padding": "8px 18px",
+            "fontWeight": "600",
+            "fontSize": "1rem",
+            "marginRight": "8px",
+            "boxShadow": "0 2px 8px rgba(37,99,235,0.12)",
+            "cursor": "pointer",
+            "transition": "background 0.2s"
+        }
+        
+        inactive_style = {
+            "backgroundColor": "transparent",
+            "color": "#2563eb",
+            "border": "2px solid #2563eb",
+            "borderRadius": "6px",
+            "padding": "8px 18px",
+            "fontWeight": "600",
+            "fontSize": "1rem",
+            "marginRight": "8px",
+            "boxShadow": "0 2px 8px rgba(37,99,235,0.12)",
+            "cursor": "pointer",
+            "transition": "background 0.2s"
+        }
+        
+        if lang == 'en':
+            return active_style, {**inactive_style, "marginRight": "0"}
+        else:  # lang == 'ru'
+            return {**inactive_style}, {**active_style, "marginRight": "0"}
+        
+    @_app.callback(
+        Output('nav-bar', 'children'),
+        [Input('user-session', 'data'),
+        Input('language-store', 'data')]
+    )
+    def manage_navigation_bar(user_session, language):
+        lang = language or 'en'
         return navigation_bar(user_session)
 
     @_app.callback(
@@ -204,19 +267,21 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('users-report-div', 'children'),
-         Output('predictions-report-div', 'children'),
-         Output('credits-report-div', 'children')],
+        Output('predictions-report-div', 'children'),
+        Output('credits-report-div', 'children')],
         [Input('refresh-button', 'n_clicks')],
-        State('user-session', 'data'),
+        [State('user-session', 'data'),
+        State('language-store', 'data')],
     )
-    def manage_admin_reports(_, user_session):
+    def manage_admin_reports(_, user_session, language):
+        lang = language or 'en'
         try:
             users_report_data = fetch_users_report(user_session=user_session)
             predictions_report_data = fetch_predictions_reports(user_session=user_session)
             credits_report_data = fetch_credits_report(user_session=user_session)
-            return (users_report(users_report_data),
-                    predictions_report(predictions_report_data),
-                    credits_report(credits_report_data))
+            return (users_report(users_report_data, lang),
+                    predictions_report(predictions_report_data, lang),
+                    credits_report(credits_report_data, lang))
         except Exception as e:
             return (error_message("Error fetching users report: " + str(e)),
                     error_message("Error fetching predictions report: " + str(e)),
@@ -234,9 +299,11 @@ def register_callbacks(_app):
         [
             State('user-session', 'data'),
             State('deposit-amount', 'value'),
+            State('language-store', 'data'),
         ]
     )
-    def manage_deposit(deposit_clicks, user_session, _deposit_amount):
+    def manage_deposit(deposit_clicks, user_session, _deposit_amount, language):
+        lang = language or 'en'
         if deposit_clicks > 0 and _deposit_amount and _deposit_amount > 0:
             transaction_info = deposit_amount(_deposit_amount, user_session=user_session)
 
@@ -244,14 +311,14 @@ def register_callbacks(_app):
                 balance = fetch_user_balance(user_session=user_session)
                 transactions = fetch_transaction_history(user_session=user_session)
                 return "", transaction_history_table(
-                    transactions), user_balance(balance)
+                    transactions, lang), user_balance(balance)
 
         raise PreventUpdate
 
     @_app.callback(
         [Output('model-dropdown', 'options'),
-         Output('model-dropdown', 'value'),
-         ],
+        Output('model-dropdown', 'value'),
+        ],
         Input('model-dropdown', 'options'),
         State('user-session', 'data')
     )
@@ -280,18 +347,40 @@ def register_callbacks(_app):
 
     #     raise PreventUpdate
 
+    # Immediate loading state when file is selected
+    @_app.callback(
+        [Output('upload-icon', 'className', allow_duplicate=True),
+        Output('upload-text', 'children', allow_duplicate=True),
+        Output('upload-text', 'style', allow_duplicate=True)],
+        Input('upload-genetic-data', 'contents'),
+        State('language-store', 'data'),
+        prevent_initial_call=True
+    )
+    def show_immediate_loading(contents, language):
+        if contents is not None:
+            lang = language or 'en'
+            return ("", 
+                "⏳ " + t("processing_file", lang), 
+                {'color': '#2563eb', 'fontWeight': '600'})
+        raise PreventUpdate
 
     @_app.callback(
         [Output('upload-status', 'children'),
-         Output('analyze-button', 'disabled')],
+        Output('analyze-button', 'disabled'),
+        Output('upload-icon', 'className'),
+        Output('upload-text', 'children'),
+        Output('upload-text', 'style')],
         Input('upload-genetic-data', 'contents'),
-        State('upload-genetic-data', 'filename')
+        [State('upload-genetic-data', 'filename'),
+        State('language-store', 'data')]
     )
-    def update_upload_status(contents, filename):
+    def update_upload_status(contents, filename, language):
+        lang = language or 'en'
         if contents is None:
-            return "", True
+            return "", True, "", "📁 " + t("drag_and_drop", lang), {}
         
         try:
+            # Show loading state immediately while processing
             content_type, content_string = contents.split(',')
             decoded = base64.b64decode(content_string)
             
@@ -299,73 +388,83 @@ def register_callbacks(_app):
             
             if validation_errors:
                 error_list = "\\n".join([f"• {error}" for error in validation_errors])
-                return dcc.Markdown(
+                return (dcc.Markdown(
                     f"❌ **File validation failed:**\\n{error_list}", 
                     style={'color': '#dc3545'}
-                ), True
+                ), True, "", "❌ " + t("upload_failed", lang), 
+                {'color': '#dc2626', 'fontWeight': '600'})
             
             file_size_mb = len(decoded) / (1024 * 1024)
             if file_size_mb > 100:
-                return dcc.Markdown(
+                return (dcc.Markdown(
                     f"⚠️ **Large file uploaded:** {filename} ({file_size_mb:.1f} MB)\\n"
                     f"Analysis may take several minutes to complete.", 
                     style={'color': '#ffc107'}
-                ), False
+                ), False, "", f"✅ {t('ready_to_analyze', lang)} {filename}",
+                {'color': '#059669', 'fontWeight': '600'})
             
-            return dcc.Markdown(f"✅ **File uploaded:** {filename}", style={'color': '#28a745'}), False
+            return (dcc.Markdown(f"✅ **{t('file_uploaded', lang)}** {filename}", style={'color': '#28a745'}), 
+                False, "", f"✅ {t('ready_to_analyze', lang)} {filename}",
+                {'color': '#059669', 'fontWeight': '600'})
             
         except Exception as e:
-            return dcc.Markdown(
+            return (dcc.Markdown(
                 f"❌ **Error reading file:** {str(e)}", 
                 style={'color': '#dc3545'}
-            ), True
+            ), True, "", "❌ " + t("upload_failed", lang),
+            {'color': '#dc2626', 'fontWeight': '600'})
 
     # Loading state callback for analyze button
     @_app.callback(
         Output('analyze-button', 'children'),
         Input('analyze-button', 'n_clicks'),
+        State('language-store', 'data'),
         prevent_initial_call=True
     )
-    def update_analyze_button_loading(n_clicks):
+    def update_analyze_button_loading(n_clicks, language):
+        lang = language or 'en'
         if n_clicks:
             return [
-                html.I(className="fas fa-spinner fa-spin", style={'marginRight': '8px'}),
-                'Analyzing... Please wait'
+                html.Span("⏳", style={'marginRight': '8px', 'fontSize': '16px'}),
+                t("processing_file", lang)
             ]
         return [
-            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-            'Analyze Rheumatoid Arthritis Risk'
+            html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
+            t("analyze_button_text", lang)
         ]
 
     @_app.callback(
         [Output('risk-results', 'children'),
-         Output('variants-section-content', 'children'),
-         Output('current-balance-predictions', 'children', allow_duplicate=True),
-         Output('results-section', 'style'),
-         Output('variants-section', 'style'),
-         Output('snp_dandelion-section', 'style'),
-         Output('snp_dandelion-plot', 'children'),
-         Output('drug-annotation-section', 'style'),
-         Output('drug-annotation-content', 'children'),
-         Output('top-10-snps-section', 'style'),
-         Output('top-10-snps-content', 'children'),
-         Output('pdf_report-section', 'style'),
-         Output('user-session', 'data', allow_duplicate=True),
-         Output('analyze-button', 'children', allow_duplicate=True)],
+        Output('variants-section-content', 'children'),
+        Output('current-balance-predictions', 'children', allow_duplicate=True),
+        Output('results-section', 'style'),
+        Output('variants-section', 'style'),
+        Output('snp_dandelion-section', 'style'),
+        Output('snp_dandelion-plot', 'children'),
+        Output('drug-annotation-section', 'style'),
+        Output('drug-annotation-content', 'children'),
+        Output('top-10-snps-section', 'style'),
+        Output('top-10-snps-content', 'children'),
+        Output('pdf_report-section', 'style'),
+        Output('user-session', 'data', allow_duplicate=True),
+        Output('analyze-button', 'children', allow_duplicate=True)],
         Input('analyze-button', 'n_clicks'),
         [State('upload-genetic-data', 'contents'),
-         State('upload-genetic-data', 'filename'),
-         State('user-session', 'data')],
+        State('upload-genetic-data', 'filename'),
+        State('user-session', 'data'),
+        State('language-store', 'data')],
         prevent_initial_call=True
     )
-    def analyze_genetic_risk(n_clicks, contents, filename, user_session):
+    def analyze_genetic_risk(n_clicks, contents, filename, user_session, language):
         if not contents or not user_session:
             raise PreventUpdate
         
+        lang = language or 'en'
+        
         # Reset button content after analysis
         reset_button_content = [
-            html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-            'Analyze Rheumatoid Arthritis Risk'
+            html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
+            t("analyze_button_text", lang)
         ]
         
         try:
@@ -375,32 +474,32 @@ def register_callbacks(_app):
             validation_errors = validate_vcf_file(filename, decoded)
             if validation_errors:
                 error_msg = f"File validation failed: {'; '.join(validation_errors)}"
-                risk_results = create_risk_results(error_message=error_msg)
+                risk_results = create_risk_results(error_message=error_msg, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             plink_result, error = analyze_rheumatoid_arthritis_risk(decoded, filename, user_session)
             
             if error:
-                risk_results = create_risk_results(error_message=error)
+                risk_results = create_risk_results(error_message=error, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
             if plink_result and plink_result.get('status') == 'success':
                 plink_data = plink_result.get('results', [{}])[0] 
-                risk_results = create_risk_results(plink_data)
+                risk_results = create_risk_results(plink_data, lang=lang)
                 
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                drug_annotation_content = create_drug_annotation_section(sample_name)
-                top_10_snps_content = create_top_10_snps_section(sample_name)
-                variants_section_content = create_variants_section(sample_name)
-                snp_dandelion_content = snp_dandelion_plot(sample_name)
+                drug_annotation_content = create_drug_annotation_section(sample_name, lang)
+                top_10_snps_content = create_top_10_snps_section(sample_name, lang)
+                variants_section_content = create_variants_section(sample_name, lang)
+                snp_dandelion_content = snp_dandelion_plot(sample_name, lang)
                 
                 # Store prediction data in session for PDF generation
                 updated_session = user_session.copy()
@@ -408,21 +507,21 @@ def register_callbacks(_app):
                 updated_session['latest_plink_data'] = plink_data
             else:
                 error_msg = plink_result.get('error', 'Unknown error')
-                risk_results = create_risk_results(error_message=error_msg)
+                risk_results = create_risk_results(error_message=error_msg, lang=lang)
                 balance = fetch_user_balance(user_session=user_session)
                 visible_style = {**card_style, 'display': 'block'}
                 hidden_style = {**card_style, 'display': 'none'}
                 sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-                return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+                return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
             
         except Exception as e:
             error_msg = f"Error processing file: {str(e)}"
-            risk_results = create_risk_results(error_message=error_msg)
+            risk_results = create_risk_results(error_message=error_msg, lang=lang)
             balance = fetch_user_balance(user_session=user_session)
             visible_style = {**card_style, 'display': 'block'}
             hidden_style = {**card_style, 'display': 'none'}
             sample_name = filename.replace('.vcf', '') if filename.endswith('.vcf') else filename
-            return risk_results, create_variants_section(sample_name), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
+            return risk_results, create_variants_section(sample_name, lang), user_balance(balance), visible_style, visible_style, visible_style, "", hidden_style, "", hidden_style, "", visible_style, user_session, reset_button_content
         
         balance = fetch_user_balance(user_session=user_session)
         visible_style = {**card_style, 'display': 'block'}
@@ -441,17 +540,19 @@ def register_callbacks(_app):
 
     @_app.callback(
         [Output('upload-genetic-data', 'children', allow_duplicate=True),
-         Output('upload-status', 'children', allow_duplicate=True),
-         Output('analyze-button', 'disabled', allow_duplicate=True)],
+        Output('upload-status', 'children', allow_duplicate=True),
+        Output('analyze-button', 'disabled', allow_duplicate=True)],
         Input('error-try-again-button', 'n_clicks'),
+        State('language-store', 'data'),
         prevent_initial_call=True
     )
-    def reset_upload_on_error(n_clicks):
+    def reset_upload_on_error(n_clicks, language):
         if n_clicks:
+            lang = language or 'en'
             return (
                 html.Div([
-                    html.I(className="fas fa-upload", style={'marginRight': '10px'}),
-                    'Drag and Drop or Click to Select Genetic Data File'
+                    html.Span(id='upload-icon', children="📁", style={'marginRight': '10px', 'fontSize': '16px'}),
+                    html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
                 ]),
                 "",
                 True

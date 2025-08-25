@@ -11,10 +11,9 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dcc.Interval(id='interval-component', interval=5 * 60 * 1000),
     dcc.Store(id='user-session', storage_type='session'),
-
     dcc.Store(id='sign-in-session-update', storage_type='session'),
     dcc.Store(id='sign-up-session-update', storage_type='session'),
-
+    dcc.Store(id='language-store', data='en', storage_type='session'),
     html.Div(id='nav-bar'),
     html.Div(id='page-content', style=page_content_style),
     html.Button(
@@ -37,7 +36,6 @@ app.layout = html.Div([
         }
     ),
     dcc.Store(id='chat-popup-visible', data=False),  # Add this to store popup state
-
     chat_popup(),
 ])
 
@@ -50,7 +48,24 @@ app.index_string = '''
         <title>{%title%}</title>
         {%favicon%}
         {%css%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
         <style>
+            /* Ensure Font Awesome icons are visible */
+            .fas, .fa {
+                font-family: "Font Awesome 6 Free" !important;
+                font-weight: 900 !important;
+                display: inline-block !important;
+            }
+            
+            /* Specific icon fixes */
+            .fa-upload::before { content: "\f093" !important; }
+            .fa-dna::before { content: "\f471" !important; }
+            .fa-info-circle::before { content: "\f05a" !important; }
+            .fa-home::before { content: "\f015" !important; }
+            .fa-key::before { content: "\f084" !important; }
+            
+            /* Chat button hover effects */
             #open-chat-popup:hover {
                 background: #0056b3 !important;
                 transform: scale(1.05) !important;
@@ -71,6 +86,61 @@ app.index_string = '''
                 transform: translateY(0px) !important;
                 background: #004494 !important;
             }
+            
+            /* Upload loading animation */
+            .fa-spin {
+                animation: fa-spin 1.5s infinite linear;
+                color: #2563eb;
+            }
+            
+            @keyframes fa-spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* Smooth transitions for upload states */
+            #upload-icon {
+                transition: all 0.3s ease;
+            }
+            
+            #upload-text {
+                transition: all 0.3s ease;
+            }
+            
+            /* Upload area hover effect */
+            div[id="upload-genetic-data"]:hover {
+                border-color: #2563eb !important;
+                background-color: #f0f7ff !important;
+                cursor: pointer;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+            }
+            
+            /* Success state styling */
+            .fa-check-circle {
+                color: #059669 !important;
+            }
+            
+            /* Error state styling */
+            .fa-exclamation-triangle {
+                color: #dc2626 !important;
+            }
+            
+            /* Upload text color changes based on state */
+            #upload-text.success {
+                color: #059669;
+                font-weight: 600;
+            }
+            
+            #upload-text.error {
+                color: #dc2626;
+                font-weight: 600;
+            }
+            
+            #upload-text.loading {
+                color: #2563eb;
+                font-weight: 600;
+            }
         </style>
     </head>
     <body>
@@ -86,4 +156,4 @@ app.index_string = '''
 
 if __name__ == '__main__':
     register_callbacks(app)
-    app.run(debug=False, host='0.0.0.0', port=9000)
+    app.run(debug=True, host='0.0.0.0', port=9000)

@@ -17,6 +17,7 @@ from frontend.ui_kit.styles import table_style, table_header_style, table_cell_s
     dropdown_style, secondary_button_style, text_style, heading5_style, primary_button_style, \
     card_style, upload_style
 from frontend.ui_kit.utils import format_timestamp
+from frontend.utils.i18n import t
 
 risk_colors = {
     'low': '#28a745',
@@ -27,17 +28,17 @@ risk_colors = {
 }
 
 
-def compute_risk_label(risk_percentile):
+def compute_risk_label(risk_percentile, lang: str = 'en'):
     if risk_percentile <= 10:
-        label = 'low'
+        label = t('low', lang)
     elif 10 < risk_percentile <= 40:
-        label = 'lower than average'
+        label = t('lower_than_average', lang)
     elif 40 < risk_percentile <= 60:
-        label = 'average'
+        label = t('average', lang)
     elif 60 < risk_percentile <= 90:
-        label = 'higher than average'
+        label = t('higher_than_average', lang)
     elif 90 < risk_percentile:
-        label = 'high'
+        label = t('high', lang)
     else:
         raise ValueError("Invalid risk percentile value")
     return label
@@ -90,15 +91,15 @@ def plot_normal_hist(risk, samples, risk_percentile):
     return histogram_fig
 
 
-def genetic_upload_form():
+def genetic_upload_form(lang: str = 'en'):
     return html.Div([
-        html.H3("Upload Genetic Data", style={'color': '#333', 'marginBottom': '15px'}),
-        html.P("Upload your sequencing data in VCF format", 
+        html.H3(t("upload_genetic_data", lang), style={'color': '#333', 'marginBottom': '15px'}),
+        html.P(t("upload_genetic_data_desc", lang), 
                style={'color': '#666', 'marginBottom': '10px'}),
         
         html.Div([
             html.I(className="fas fa-coins", style={'marginRight': '5px', 'color': '#ffc107'}),
-            html.Span("Cost: 50 credits per analysis", 
+            html.Span(t("cost_per_analysis", lang), 
                      style={'color': '#666', 'fontSize': '14px', 'fontWeight': 'bold'})
         ], style={'marginBottom': '15px', 'padding': '8px', 'backgroundColor': '#fff3cd', 
                  'border': '1px solid #ffeaa7', 'borderRadius': '4px'}),
@@ -106,8 +107,8 @@ def genetic_upload_form():
         dcc.Upload(
             id='upload-genetic-data',
             children=html.Div([
-                html.I(className="fas fa-upload", style={'marginRight': '10px'}),
-                'Drag and Drop or Click to Select Genetic Data File'
+                html.Span(id='upload-icon', children="📁", style={'marginRight': '10px', 'fontSize': '16px'}),
+                html.Span(id='upload-text', children=t("drag_and_drop", lang), style={})
             ]),
             style=upload_style,
             multiple=False
@@ -117,8 +118,8 @@ def genetic_upload_form():
         
         html.Button(
             children=[
-                html.I(className="fas fa-dna", style={'marginRight': '8px'}),
-                'Analyze Rheumatoid Arthritis Risk'
+                html.Span("🧬", style={'marginRight': '8px', 'fontSize': '16px'}),
+                t("analyze_button_text", lang)
             ],
             id='analyze-button', 
             className='btn-primary', 
@@ -129,54 +130,54 @@ def genetic_upload_form():
     ], className='card', style=card_style)
 
 
-def create_error_display(error_message):
+def create_error_display(error_message, lang: str = 'en'):
     
     if "BCFtools filtering failed" in error_message:
-        error_type = "Invalid VCF Format"
-        description = "The uploaded file appears to be corrupted or is not a valid VCF format."
+        error_type = t("error_invalid_vcf", lang)
+        description = t("error_invalid_vcf_desc", lang)
         suggestions = [
-            "Ensure your file is in VCF format (.vcf extension)",
-            "Check that the file is not corrupted during upload",
-            "Try re-downloading the original file from your genetic testing provider"
+            t("suggestion_vcf_format", lang),
+            t("suggestion_file_corruption", lang),
+            t("suggestion_redownload", lang)
         ]
     elif "PLINK conversion failed" in error_message:
-        error_type = "VCF Processing Error"
-        description = "The VCF file could not be processed by PLINK. This may be due to incompatible format or missing required fields."
+        error_type = t("error_vcf_processing", lang)
+        description = t("error_vcf_processing_desc", lang)
         suggestions = [
-            "Ensure your VCF file contains proper genotype information",
-            "Check that the file follows VCF 4.x specifications",
-            "Verify that genetic variants have proper chromosome and position information"
+            t("suggestion_genotype_info", lang),
+            t("suggestion_vcf_specs", lang),
+            t("suggestion_chromosome_info", lang)
         ]
     elif "PLINK PRS calculation failed" in error_message:
-        error_type = "Risk Score Calculation Error"
-        description = "Unable to calculate the polygenic risk score. This may be due to insufficient genetic variants matching our reference panel."
+        error_type = t("error_risk_calculation", lang)
+        description = t("error_risk_calculation_desc", lang)
         suggestions = [
-            "Your genetic data may not contain enough variants for reliable risk calculation",
-            "Ensure your data is from a compatible genetic testing platform",
-            "Try uploading data from 23andMe, AncestryDNA, or similar whole-genome platforms"
+            t("suggestion_insufficient_variants", lang),
+            t("suggestion_compatible_platform", lang),
+            t("suggestion_known_platforms", lang)
         ]
     elif "Profile file not found" in error_message:
-        error_type = "Analysis Output Error"
-        description = "The analysis completed but results could not be generated properly."
+        error_type = t("error_analysis_output", lang)
+        description = t("error_analysis_output_desc", lang)
         suggestions = [
-            "This appears to be a system error - please try uploading again",
-            "If the problem persists, contact support"
+            t("suggestion_system_error", lang),
+            t("suggestion_contact_support", lang)
         ]
     elif "timeout" in error_message.lower() or "connection" in error_message.lower():
-        error_type = "Connection Error"
-        description = "The analysis request timed out or lost connection to the processing server."
+        error_type = t("error_connection", lang)
+        description = t("error_connection_desc", lang)
         suggestions = [
-            "Check your internet connection and try again",
-            "Large files may take longer to process - please wait a few minutes",
-            "If the problem persists, try again later"
+            t("suggestion_check_connection", lang),
+            t("suggestion_large_files", lang),
+            t("suggestion_try_later", lang)
         ]
     else:
-        error_type = "Analysis Error"
-        description = "An unexpected error occurred during genetic data analysis."
+        error_type = t("error_analysis", lang)
+        description = t("error_analysis_desc", lang)
         suggestions = [
-            "Please check that your file is a valid VCF format",
-            "Ensure the file is from a reputable genetic testing service",
-            "Try uploading the file again"
+            t("suggestion_valid_vcf", lang),
+            t("suggestion_reputable_service", lang),
+            t("suggestion_try_again", lang)
         ]
     
     return html.Div([
@@ -194,7 +195,7 @@ def create_error_display(error_message):
         }),
         
         html.Div([
-            html.H5("Suggestions to fix this issue:", style={
+            html.H5(t("suggestions_fix_issue", lang), style={
                 'color': '#333', 
                 'margin': '10px 0',
                 'fontSize': '16px'
@@ -206,7 +207,7 @@ def create_error_display(error_message):
         ]),
         
         html.Details([
-            html.Summary("Technical Details", style={
+            html.Summary(t("technical_details", lang), style={
                 'color': '#007bff', 
                 'cursor': 'pointer',
                 'margin': '15px 0 10px 0',
@@ -224,7 +225,7 @@ def create_error_display(error_message):
         ]),
         
         html.Div([
-            html.Button('Try Again', 
+            html.Button(t('try_again', lang), 
                        id='error-try-again-button', className='btn-primary',
                        style={
                            **primary_button_style,
@@ -239,9 +240,9 @@ def create_error_display(error_message):
     })
 
 
-def create_risk_results(plink_data=None, error_message=None):
+def create_risk_results(plink_data=None, error_message=None, lang: str = 'en'):
     if error_message:
-        return create_error_display(error_message)
+        return create_error_display(error_message, lang)
     
     if plink_data:
         risk = plink_data.get('score', 0.0)
@@ -254,17 +255,29 @@ def create_risk_results(plink_data=None, error_message=None):
         np.random.seed(0)
         samples = np.random.normal(loc=mean, scale=std_dev, size=1000)
         risk_percentile = percentileofscore(samples, risk, kind='weak')
-        risk_label = compute_risk_label(risk_percentile)
+        risk_label = compute_risk_label(risk_percentile, lang)
+        
+        # Determine color based on percentile, not translated text
+        if risk_percentile <= 10:
+            color_key = 'low'
+        elif 10 < risk_percentile <= 40:
+            color_key = 'lower than average'
+        elif 40 < risk_percentile <= 60:
+            color_key = 'average'
+        elif 60 < risk_percentile <= 90:
+            color_key = 'higher than average'
+        else:
+            color_key = 'high'
     else:
         return html.Div([
-            html.H4(f"No uploaded data found", style={'color': '#dc3545', 'margin': '0 0 10px 0'}),
-            html.P("Please upload your genetic data to analyze rheumatoid arthritis risk.", 
+            html.H4(t("no_uploaded_data", lang), style={'color': '#dc3545', 'margin': '0 0 10px 0'}),
+            html.P(t("upload_data_to_analyze", lang), 
                    style={'color': '#666', 'margin': '0 0 10px 0'}) 
         ])
 
     return html.Div([
         html.Div([
-            html.P(f"Number of alleles detected: {snps_used}", 
+            html.P(f"{t('number_alleles_detected', lang)} {snps_used}", 
                    style={'fontSize': '14px', 'color': '#666', 'margin': '5px 0'})
         ]) if plink_data else "",
 
@@ -276,11 +289,11 @@ def create_risk_results(plink_data=None, error_message=None):
             ),
             html.Div([
                 html.P([
-                    "Your risk is ",
-                    html.B(risk_label, style={'color': risk_colors[risk_label]}),
-                    ". It is higher than in ",
-                    html.B(f"{math.floor(risk_percentile)}%"),
-                    " of people."
+                    t("your_risk_is", lang) + " ",
+                    html.B(risk_label, style={'color': risk_colors[color_key]}),
+                    t("higher_than", lang) + " ",
+                    html.B(f"{math.floor(risk_percentile)}"),
+                    t("of_people", lang)
                 ], style={
                     'color': '#333',
                     'fontSize': '20px',
@@ -302,17 +315,17 @@ def create_risk_results(plink_data=None, error_message=None):
 
 
         html.Div([
-            html.H5("Recommendations:", style={'margin': '15px 0 10px 0'}),
+            html.H5(t("recommendations", lang), style={'margin': '15px 0 10px 0'}),
             html.Ul([
-                html.Li("Consult with a rheumatologist for further evaluation"),
-                html.Li("Consider regular joint health monitoring"),
-                html.Li("Maintain healthy weight and regular exercise"),
-                html.Li("Avoid smoking")
-            ] if risk_label in ['higher than average', 'high'] else [
-                html.Li("Maintain current healthy lifestyle"),
-                html.Li("Regular exercise to maintain joint flexibility"),
-                html.Li("Balanced diet rich in omega-3 fatty acids"),
-                html.Li("Avoid smoking")
+                html.Li(t("recommendation_1", lang)),
+                html.Li(t("recommendation_2", lang)),
+                html.Li(t("recommendation_3", lang)),
+                html.Li(t("recommendation_4", lang))
+            ] if color_key in ['higher than average', 'high'] else [
+                html.Li(t("recommendation_low_1", lang)),
+                html.Li(t("recommendation_low_2", lang)),
+                html.Li(t("recommendation_low_3", lang)),
+                html.Li(t("recommendation_low_4", lang))
             ])
         ])
     ])
@@ -378,7 +391,7 @@ def format_links(link_str):
         formatted_links.append(f"[{i+1}]({url})")
     return ' '.join(formatted_links)
 
-def create_variants_section(sample):
+def create_variants_section(sample, lang: str = 'en'):
     csv_path = 'input/annotations/yet_another_final_PGS000195_metadata.csv'
     tsv_path = f'output/{sample}_final_prs_table.tsv'
 
@@ -454,14 +467,14 @@ def create_variants_section(sample):
         }),
 
         html.Div([
-                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.H5(t("understanding_results", lang), style={'margin': '20px 0 10px 0', 'color': '#333'}),
                 html.Ul([
-                    html.Li("This section shows the genetic variants associated with rheumatoid arthritis that are present in your genetic data"),
-                    html.Li("The x-axis shows the genomic position of the variant, y-axis shows the effect size of the variant on rheumatoid arthritis risk"),
-                    html.Li(["Color intensity indicates effect strength: ", html.B("red/warm colors = stronger effect"), ", ", html.B("blue/cool colors = weaker effect")]),
-                    html.Li("If you hover over a point, you will see more information about the variant"),
-                    html.Li("The table below the plot shows detailed information about the variants, such as the gene name and symbol, chromosome, position and etc."),
-                    html.Li([html.B("You can click on the links in the Sources column to learn more about each variant")])
+                    html.Li(t("understanding_variants", lang)),
+                    html.Li(t("understanding_position", lang)),
+                    html.Li([t("understanding_color", lang) + " ", html.B(t("color_strong", lang)), ", ", html.B(t("color_weak", lang))]),
+                    html.Li(t("understanding_hover", lang)),
+                    html.Li(t("understanding_table", lang)),
+                    html.Li([html.B(t("understanding_links", lang))])
                 ], style={'color': '#666', 'fontSize': '14px'})
             ], style={
                 'backgroundColor': '#f8f9fa',
@@ -473,7 +486,7 @@ def create_variants_section(sample):
     ])
 
 
-def snp_dandelion_plot(sample):
+def snp_dandelion_plot(sample, lang: str = 'en'):
     tsv_path = f'output/{sample}_final_prs_table.tsv'
     try:
         df = pd.read_csv(tsv_path, sep='\t')
@@ -643,12 +656,12 @@ def snp_dandelion_plot(sample):
             image_components.append(image_component)
         
         return html.Div([
-            html.H3("Top 3 SNPs by Effect Size", style={
+            html.H3(t("top_3_snps_title", lang), style={
                 'textAlign': 'center', 
                 'margin': '20px 0 10px 0', 
                 'color': '#333'
             }),
-            html.P("The regions are centered around SNPs and encompass 200 kb", style={
+            html.P(t("regions_centered", lang), style={
                 'textAlign': 'center',
                 'margin': '0 0 0px 0',
                 'color': '#0066cc',
@@ -671,7 +684,7 @@ def snp_dandelion_plot(sample):
 
 
 
-def create_top_10_snps_section(sample):
+def create_top_10_snps_section(sample, lang: str = 'en'):
     
     tsv_path = f'output/{sample}_final_prs_table.tsv'
     
@@ -699,7 +712,7 @@ def create_top_10_snps_section(sample):
         df_display = df_sorted.rename(columns=display_columns)
     
         return html.Div([
-            html.P(f"Showing top 10 SNPs with highest effect sizes from your genetic analysis", 
+            html.P(t("showing_top_10_snps", lang), 
                    style={'marginBottom': '15px', 'color': '#666'}),
             
             dash_table.DataTable(
@@ -750,12 +763,12 @@ def create_top_10_snps_section(sample):
             ),
             
             html.Div([
-                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.H5(t("understanding_results", lang), style={'margin': '20px 0 10px 0', 'color': '#333'}),
                 html.Ul([
-                    html.Li("Higher effect sizes indicate stronger contribution to rheumatoid arthritis risk"),
-                    html.Li("Your genotype shows how many copies of the effect allele you carry (0, 1, or 2)"),
-                    html.Li("Allele frequency represents how common this variant is in the population"),
-                    html.Li("These SNPs are part of the polygenic risk score calculation")
+                    html.Li(t("effect_size_contribution", lang)),
+                    html.Li(t("genotype_explanation", lang)),
+                    html.Li(t("allele_frequency_explanation", lang)),
+                    html.Li(t("snps_part_of_prs", lang))
                 ], style={'color': '#666', 'fontSize': '14px'})
             ], style={
                 'backgroundColor': '#f8f9fa',
@@ -821,7 +834,7 @@ def create_top_10_snps_section(sample):
 #         ]
 #     )
 
-def create_drug_annotation_section(sample):
+def create_drug_annotation_section(sample, lang: str = 'en'):
     csv_path = f'output/{sample}_intersection_with_drug_annotation.csv'
     
     try:
@@ -864,7 +877,7 @@ def create_drug_annotation_section(sample):
             ])
         
         return html.Div([
-            html.P(f"Showing {len(df_filtered)} drug-gene interactions from your genetic data", 
+            html.P(t("showing_drug_interactions", lang).format(count=len(df_filtered)), 
                    style={'marginBottom': '15px', 'color': '#666'}),
             
             html.Div([
@@ -909,13 +922,13 @@ def create_drug_annotation_section(sample):
             ]),  # Added container with horizontal scroll
             
             html.Div([
-                html.H5("Understanding the Results:", style={'margin': '20px 0 10px 0', 'color': '#333'}),
+                html.H5(t("understanding_results", lang), style={'margin': '20px 0 10px 0', 'color': '#333'}),
                 html.Ul([
-                    html.Li("This section shows genetic variants found in your data associated with drug efficacy and toxicity"),
-                    html.Li("The column sample shows your genotype for each variant. 1/1 - both alleles are present, 1/0 or 0/1 - one allele is present"),
-                    html.Li("The column Drugs shows the drugs that may be affected by these variants"),
-                    html.Li("The column Phenotype Categories shows the type of effect the variant has on drug response"),
-                    html.Li("You can filter and sort the table to find specific variants or drugs")
+                    html.Li(t("drug_section_explanation", lang)),
+                    html.Li(t("sample_column_explanation", lang)),
+                    html.Li(t("drugs_column_explanation", lang)),
+                    html.Li(t("phenotype_column_explanation", lang)),
+                    html.Li(t("filter_sort_explanation", lang))
                 ], style={'color': '#666', 'fontSize': '14px'})
             ], style={
                 'backgroundColor': '#f8f9fa',
@@ -932,54 +945,48 @@ def create_drug_annotation_section(sample):
                    style={'color': '#dc3545', 'fontStyle': 'italic'})
         ])
 
-def prediction_layout(user_session):
+def prediction_layout(user_session, lang: str = 'en'):
     balance = fetch_user_balance(user_session)
     predictions = fetch_prediction_history(user_session)
     
     return html.Div([
-        html.H1("Rheumatoid Arthritis Polygenic Risk Score Prediction", 
+        html.H1(t("prediction_title", lang), 
                 style={'textAlign': 'center', 'color': '#333', 'marginBottom': '30px'}),
         
         html.Div(user_balance(balance), id='current-balance-predictions'),
         
-        genetic_upload_form(),
+        genetic_upload_form(lang),
         
         html.Div([
-            html.H3("Your Polygenic Risk Assessment Results", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("risk_assessment_results", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='risk-results')
         ], className='card', style={**card_style, 'display': 'none'}, id='results-section'),
         
         html.Div([
-            html.H3("PRS Effect Weights Across Genome", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("prs_effect_weights", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='variants-section-content')  
         ], className='card', style={**card_style, 'display': 'none'}, id='variants-section'),
 
 
         html.Div([
-            html.H3("snp_dandelion-plot", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("genomic_regions", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
         ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
 
 
         html.Div([
-            html.H3("Mutations Responsible For Drug Efficacy and Toxicity", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("drug_efficacy", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='drug-annotation-content')
         ], className='card', style={**card_style, 'display': 'none'}, id='drug-annotation-section'),
 
         html.Div([
-            html.H3("Top 10 Most Influential SNPs", style={'color': '#333', 'marginBottom': '15px'}),
+            html.H3(t("top_10_snps", lang), style={'color': '#333', 'marginBottom': '15px'}),
             html.Div(id='top-10-snps-content')
         ], className='card', style={**card_style, 'display': 'none'}, id='top-10-snps-section'),
 
-         html.Div([
-            html.H3("Visualizations of genomic regions containing SNPs", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Div(id='snp_dandelion-plot', style={'marginTop': '10px'})
-        ], className='card', style={**card_style, 'display': 'none'}, id='snp_dandelion-section'),
-
-
         html.Div([
-            html.H3("PDF report", style={'color': '#333', 'marginBottom': '15px'}),
-            html.Button('Download PDF Report', id='download-pdf-button', className='btn-primary', 
+            html.H3(t("pdf_report", lang), style={'color': '#333', 'marginBottom': '15px'}),
+            html.Button(t("download_pdf_report", lang), id='download-pdf-button', className='btn-primary', 
             style=primary_button_style, disabled=True),
             dcc.Download(id='download-component')
         ], className='card', style={**card_style, 'display': 'none'}, id='pdf_report-section')

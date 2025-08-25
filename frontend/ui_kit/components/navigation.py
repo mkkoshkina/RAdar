@@ -48,7 +48,7 @@ def navigation_bar(user_session):
                 html.Img(
                     src='/assets/logo.png',
                     style={
-                        'height': '60px',      # Fixed height
+                        'height': '70px',      # Fixed height
                         'maxHeight': '60px',   # Ensure it doesn't exceed
                         'objectFit': 'contain',
                         'display': 'block'
