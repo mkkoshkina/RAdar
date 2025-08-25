@@ -833,7 +833,7 @@ def create_drug_annotation_section(sample):
         
         df = pd.read_csv(csv_path)
 
-        original_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        original_columns = ['CHROM', 'POS', 'ID_x', 'REF', 'ALT', 'sample', 'Gene', 'Drugs', 'Study']
         available_original_columns = [col for col in original_columns if col in df.columns]
         
         if not available_original_columns:
@@ -844,13 +844,16 @@ def create_drug_annotation_section(sample):
         
         df.rename(columns={"CHROM": "Chromosome", "POS": "Position", "ID_x": "SNP ID", "REF": "Reference Allele", "ALT": "Alternate Allele", 'sample': 'Sample'}, inplace=True)
         
-        renamed_columns = ['Chromosome', 'Position', 'SNP ID', 'Reference Allele', 'Alternate Allele', 'Sample', 'Gene', 'Drugs', 'Phenotype Categories']
+        renamed_columns = ['Chromosome', 'Position', 'SNP ID', 'Reference Allele', 'Alternate Allele', 'Sample', 'Gene', 'Drugs', 'Study']
         available_columns = [col for col in renamed_columns if col in df.columns]
         
         df_filtered = df[available_columns].copy()
         
         df_filtered = df_filtered.dropna(how='all')
         df_filtered = df_filtered[df_filtered['Sample'].str.contains('1/0|0/1|1/1', na=False)]
+
+        if 'Study' in df_filtered.columns:
+            df['Study'] = df['Study'].apply(format_links)
 
         if df_filtered.empty:
             return html.Div([
