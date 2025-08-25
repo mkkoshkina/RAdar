@@ -5,7 +5,7 @@ jupyter_notebooks/yet_another_final_PGS000195_metadata.csv
 *.pyc
 *__init__.py
 
-input/
+input/vcf
 output/
 *.png
 rs*.png
@@ -210,8 +210,6 @@ dmypy.json
 
 # Additional ignores from main branch
 /__pycache__
-input
 log
 output
 *.db
-*_metadata.csv

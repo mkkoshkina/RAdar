@@ -1,0 +1,107 @@
+ID	Level	Variant	Gene	Drugs	Phenotype Categories	Phenotype	Pediatric
+982031241	3	rs3794271	SLCO1C1	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Arthritis, Psoriatic; Rheumatoid arthritis	false
+1449003869	3	rs7574865	STAT4	etanercept	Efficacy	Rheumatoid arthritis	false
+1449165158	4	rs1128503	ABCB1	methotrexate	Toxicity	Rheumatoid arthritis	false
+1450371701	3	rs396991	FCGR3A	tocilizumab	Efficacy	Rheumatoid arthritis	false
+1451411080	3	rs1051792	MICA	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1449165169	4	rs2273697	ABCC2	methotrexate	Toxicity	Rheumatoid arthritis	true
+1448266609	3	rs7301582	KLRC1	adalimumab; certolizumab pegol; etanercept; glucocorticoids; infliximab; methotrexate	Efficacy	Rheumatoid arthritis	false
+655386421	3	rs1051266	SLC19A1	methotrexate	Toxicity	Drug Toxicity; Rheumatoid arthritis	true
+1043880467	3	rs4986790	TLR4	folic acid; methotrexate	Toxicity	Rheumatoid arthritis	false
+1448100451	3	rs10945919		Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1448266599	3	rs2302489	KLRD1	adalimumab; certolizumab pegol; etanercept; glucocorticoids; infliximab; methotrexate	Efficacy	Rheumatoid arthritis	false
+1448112486	3	rs11052877	CD69	tocilizumab	Efficacy	Rheumatoid arthritis	false
+1183615415	3	rs767455	TNFRSF1A	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879864	3	rs5760410	ADORA2A; SPECC1L	methotrexate	Toxicity	Rheumatoid arthritis	false
+1448112493	3	rs4910008	GALNT18	tocilizumab	Efficacy	Rheumatoid arthritis	false
+1449003875	3	rs2233945	PSORS1C1	etanercept	Efficacy	Rheumatoid arthritis	false
+1444673060	3	rs1800470	TGFB1	rituximab	Efficacy	Rheumatoid arthritis	false
+655386961	3	rs2298383	ADORA2A	methotrexate	Toxicity	Rheumatoid arthritis	false
+981204026	3	rs9977268	SLC19A1	methotrexate	Efficacy	Rheumatoid arthritis	false
+1444700767	3	rs12083537	IL6R	tocilizumab	Efficacy	Rheumatoid arthritis	false
+1184169936	3	rs1801274	FCGR2A	adalimumab; infliximab	Efficacy	Rheumatoid arthritis	false
+1448526098	3	rs11265618	IL6R	tocilizumab	Efficacy	Rheumatoid arthritis	false
+1447979272	3	rs2234693	ESR1	leflunomide	Efficacy	Rheumatoid arthritis	false
+1444703578	4	rs2650972		methotrexate	Efficacy	Rheumatoid arthritis	false
+1447960582	3	rs719235	GGH	methotrexate	Toxicity	Rheumatoid arthritis	false
+655386969	3	rs3761422	ADORA2A	methotrexate	Toxicity	Rheumatoid arthritis	false
+1183689409	4	rs1799724	TNF	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Crohn Disease; Psoriasis; Rheumatoid arthritis; Spondylitis, Ankylosing	false
+1444703571	4	rs4982133		methotrexate	Efficacy	Rheumatoid arthritis	false
+1444704335	3	rs1061631	TNFRSF1B	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655386436	3	rs1801131	MTHFR	methotrexate	Toxicity	Rheumatoid arthritis	true
+1444703560	4	rs6506569	PTPRM	methotrexate	Efficacy	Rheumatoid arthritis	false
+1444704328	3	rs3397	TNFRSF1B	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655384902	4	rs762551	CYP1A2	leflunomide	Toxicity	Rheumatoid arthritis	false
+1451635167	4	rs1801394	FASTKD3; MTRR	methotrexate	Toxicity	Juvenile Rheumatoid Arthritis; Rheumatoid arthritis	true
+655384906	3	rs3213422	DHODH	leflunomide	Efficacy	Rheumatoid arthritis	false
+1444704321	3	rs1061622	TNFRSF1B	infliximab; Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1451634907	3	rs1805087	MTR	folic acid; hydroxychloroquine; methotrexate; sulfasalazine	Efficacy	Rheumatoid arthritis	false
+1444703100	4	rs1703794		methotrexate	Efficacy	Rheumatoid arthritis	false
+1444843389	3	rs246240	ABCC1	methotrexate	Efficacy	Rheumatoid arthritis	false
+1451634914	3	rs1805087	MTR	methotrexate	Efficacy	Rheumatoid arthritis	false
+655385462	3	rs1045642	ABCB1	methotrexate	Efficacy,Toxicity	Rheumatoid arthritis	true
+1444843382	3	rs11231809	SLC22A11	methotrexate	Efficacy	Rheumatoid arthritis	false
+1444704366	4	rs4329505	IL6R	tocilizumab	Efficacy	Rheumatoid arthritis	false
+827848740	3	rs9340799	ESR1	leflunomide	Efficacy	Rheumatoid arthritis	false
+655386981	3	rs2267076	ADORA2A	methotrexate	Toxicity	Rheumatoid arthritis	false
+655386985	3	rs2236624	ADORA2A	methotrexate	Toxicity	adverse events; Rheumatoid arthritis	false
+637879932	3	rs2814707	MOB3B	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1451634940	3	rs1805087	MTR	methotrexate	Toxicity	Rheumatoid arthritis	false
+1448100396	3	rs13393173	CERS6	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879942	3	rs437943	ARAP2	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879937	3	rs3849942	C9orf72	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+981204210	4	rs17602729	AMPD1	methotrexate	Efficacy,Toxicity	Rheumatoid arthritis	false
+1449165034	3	rs2231142	ABCG2	methotrexate	Toxicity	Rheumatoid arthritis	false
+637879947	3	rs6138150	CST5	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879957	3	rs854555	PON1	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+981201642	3	rs11280056	ENOSF1; TYMS	methotrexate	Efficacy	Acute lymphoblastic leukemia; Rheumatoid arthritis	true
+655385475	3	rs4846051	MTHFR	methotrexate	Toxicity	Drug Toxicity; Rheumatoid arthritis	false
+1444843402	3	rs3784864	ABCC1	methotrexate	Efficacy	Rheumatoid arthritis	false
+637879952	3	rs7046653	MOB3B	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655385479	3	rs1800909	GGH	methotrexate	Efficacy	Rheumatoid arthritis	false
+637879967	3	rs854547	PON1	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1444608384	2B	rs396991	FCGR3A	rituximab	Efficacy	Neuromyelitis Optica; Rheumatoid arthritis	false
+1451159780	3	rs371194629	HLA-G	methotrexate	Efficacy	Rheumatoid arthritis	false
+699639336	3	rs1801131	MTHFR	methotrexate	Efficacy	Rheumatoid arthritis	false
+981201637	4	rs11280056	TYMS	methotrexate	Toxicity	Drug Toxicity; Hematopoietic stem cell transplantation; Psoriasis; Rheumatoid arthritis; Toxic liver disease	false
+637879962	3	rs854548	PON1	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655387825	3	rs1544105	FPGS	methotrexate	Efficacy	Rheumatoid arthritis	false
+637879972	3	rs6028945	MAFB	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1183700527	3	rs10919563	PTPRC	adalimumab; etanercept; infliximab; Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655385267	3	rs35592	ABCC1	methotrexate	Efficacy	Psoriasis; Rheumatoid arthritis	false
+637879982	3	rs983332	CSRP3	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879977	3	rs6071980	MAFB	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1451245360	2A	rs1051266	SLC19A1	methotrexate	Efficacy	Rheumatoid arthritis	false
+637879987	3	rs774359	C9orf72	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+637879997	3	rs928655	GBP6	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+655387821	3	rs2853539	TYMS	methotrexate	Efficacy	Rheumatoid arthritis	false
+637879992	3	rs868856	MOB3B	Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1444703649	4	rs6064463		methotrexate	Efficacy	Rheumatoid arthritis	false
+655385299	4	rs2372536	ATIC	methotrexate	Efficacy	Rheumatoid arthritis	false
+1184748889	3	rs1643650	DHFR	methotrexate	Efficacy	Rheumatoid arthritis	false
+981202366	3	rs3758149	GGH	methotrexate	Efficacy	Rheumatoid arthritis	false
+1184748884	3	rs10197559	ATIC	methotrexate	Toxicity	Rheumatoid arthritis	false
+981202609	2B	rs4673993	ATIC	methotrexate	Efficacy	Rheumatoid arthritis	false
+655385307	2A	rs1801133	MTHFR	methotrexate	Toxicity	Arthritis, Psoriatic; Drug Toxicity; Juvenile Rheumatoid Arthritis; Rheumatoid arthritis	true
+1451110320	3	rs2838956	SLC19A1	methotrexate	Toxicity	adverse events; Rheumatoid arthritis	false
+655384799	2B	rs1800629	TNF	etanercept	Efficacy	Arthritis, Psoriatic; Crohn Disease; Inflammation; Psoriasis; Rheumatoid arthritis; Spondylitis, Ankylosing	false
+1447945887	3	rs396991	FCGR3A	infliximab	Efficacy	Rheumatoid arthritis	false
+1184748879	3	rs16853826	ATIC	methotrexate	Toxicity	Rheumatoid arthritis	false
+1444702664	3	rs3761847	TRAF1	adalimumab; etanercept; infliximab; Tumor necrosis factor alpha (TNF-alpha) inhibitors	Efficacy	Rheumatoid arthritis	false
+1184748874	3	rs17421511	MTHFR	methotrexate	Efficacy	Rheumatoid arthritis	false
+1183704404	3	rs6427528	CD84	etanercept	Efficacy	Psoriasis; Rheumatoid arthritis	false
+1184748865	3	rs1476413	MTHFR	methotrexate	Efficacy	Rheumatoid arthritis	false
+1444703171	3	rs1800795	IL6	adalimumab; etanercept; infliximab	Efficacy	Rheumatoid arthritis	false
+1451411555	3	rs17004921	ADORA2A-AS1	methotrexate	Efficacy	Rheumatoid arthritis	false
+1444703480	4	rs7624766		methotrexate	Efficacy	Rheumatoid arthritis	false
+1451257700	3	rs1801394	MTRR	methotrexate	Efficacy	Juvenile Rheumatoid Arthritis; Rheumatoid arthritis	true
+1444703223	4	rs1901633		methotrexate	Efficacy	Rheumatoid arthritis	false
+1451621742	4	rs1045642	ABCB1	methotrexate	Efficacy	Juvenile Rheumatoid Arthritis; Rheumatoid arthritis	true
+1451810680	3	rs2292596	AHRR	methotrexate	Efficacy	Rheumatoid arthritis	false
+1447952831	3	rs1264457	HLA-E	adalimumab; certolizumab pegol; etanercept; glucocorticoids; infliximab; methotrexate	Efficacy	Rheumatoid arthritis	false
+1183615359	3	rs1800471	TGFB1	rituximab	Efficacy	Rheumatoid arthritis	false
+981238415	3	rs1127354	ITPA	methotrexate	Efficacy,Toxicity	Acute lymphoblastic leukemia; Rheumatoid arthritis	true
+1450371713	3	rs1801274	FCGR2A	rituximab	Efficacy	Rheumatoid arthritis	false
+1444686824	3	rs2231142	ABCG2	sulfasalazine	Efficacy	Rheumatoid arthritis	false
+655385323	3	rs45445694	C18orf56; TYMS	methotrexate	Efficacy	Rheumatoid arthritis	false
+1447952819	3	rs1059150	ATP5F1E	adalimumab; certolizumab pegol; etanercept; glucocorticoids; infliximab; methotrexate	Efficacy	Rheumatoid arthritis	false
